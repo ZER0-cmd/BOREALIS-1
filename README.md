@@ -1,8 +1,6 @@
 
 
-![alt text][logo]
-
-[logo]: [https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"](https://github.com/ZER0-cmd/BOREALIS-1/blob/main/Pictures/BOREALIS-1%20LIGGANDE%20(2)%20(2).png)
+![# BOREALIS-1 (Astronomisk Ungdom)] [https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"](https://github.com/ZER0-cmd/BOREALIS-1/blob/main/Pictures/BOREALIS-1%20LIGGANDE%20(2)%20(2).png)
 
 
 
