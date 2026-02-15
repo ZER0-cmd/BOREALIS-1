@@ -28,6 +28,10 @@ class getter:
         return self.y
     def keys(self):
         return self.headers
+    def mean(self, index=None):
+        if index is None:
+            return self.y.mean()
+        return self[index].mean()
 
 class read:
     def __init__(self, path:str = 'data.csv', x:str='alt'):
