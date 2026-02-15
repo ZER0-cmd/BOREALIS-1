@@ -24,10 +24,14 @@ class getter:
         if isinstance(key, str):
             key = self.headers.index(key)
         self.y[key] = value
-    def values(self):
+    def värden(self):
         return self.y
-    def keys(self):
+    def storheter(self):
         return self.headers
+    def medelvärde(self, index=None):
+        if index is None:
+            return self.y.mean()
+        return self[index].mean()
 
 class läs:
     def __init__(self, path:str = 'data.csv', x:str='alt'):
@@ -59,7 +63,7 @@ class grafritare:
             self.data.x = x
         mask = slice(None) if ft is None else (ft[0] <= self.data.x) & (self.data.x <= ft[1])
         self.data.x = self.data.x[mask]
-        self.data.y = self.data.y.values().T[mask].T
+        self.data.y = self.data.y.värden().T[mask].T
     
     def __update(self, index, target, n):
         if index not in self.dict.keys():
@@ -143,7 +147,7 @@ class grafritare:
         fig.tight_layout()
         plt.show()
 
-    def visafödelning(self, normal:bool=True, title:bool=False, *, grid:bool=True, res=100):
+    def visafördelning(self, normal:bool=True, title:bool=False, *, grid:bool=True, res=100):
         q = []
         label = []
         for p in self.dict.values():
