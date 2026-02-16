@@ -5,210 +5,6 @@
 	(uuid "02d62f2f-c7cc-4984-8541-1469cdc83313")
 	(paper "A4")
 	(lib_symbols
-		(symbol "878-22-004-10-011101:878-22-004-10-011101"
-			(pin_names
-				(offset 0.762)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "J"
-				(at 16.51 7.62 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "878-22-004-10-011101"
-				(at 16.51 5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" "8782200410011101"
-				(at 16.51 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "https://www.mill-max.com/products/spring-loaded/slc-pin-header-strip/878-xx-xxx-10-011101/878-22-004-10-011101?s_term=878-22-004-10-011101&s_type=Quick/Product/Part%20Number%20Search"
-				(at 16.51 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Description" "Headers & Wire Housings Magnetic Spring-Loaded Pin Header Strip 4 Pins"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description_1" "Headers & Wire Housings Magnetic Spring-Loaded Pin Header Strip 4 Pins"
-				(at 16.51 -2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Height" "9.6"
-				(at 16.51 -5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Mouser Part Number" "575-8782200410010000"
-				(at 16.51 -7.62 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Mill-Max/878-22-004-10-011101?qs=t7xnP681wgWdOYPvR3%252B%2FbA%3D%3D"
-				(at 16.51 -10.16 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Manufacturer_Name" "Mill-Max"
-				(at 16.51 -12.7 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Manufacturer_Part_Number" "878-22-004-10-011101"
-				(at 16.51 -15.24 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(symbol "878-22-004-10-011101_0_0"
-				(pin passive line
-					(at 0 0 0)
-					(length 5.08)
-					(name "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -2.54 0)
-					(length 5.08)
-					(name "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -5.08 0)
-					(length 5.08)
-					(name "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -7.62 0)
-					(length 5.08)
-					(name "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(symbol "878-22-004-10-011101_0_1"
-				(polyline
-					(pts
-						(xy 5.08 2.54) (xy 15.24 2.54) (xy 15.24 -10.16) (xy 5.08 -10.16) (xy 5.08 2.54)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Connector:Conn_01x04_Pin"
 			(pin_names
 				(offset 1.016)
@@ -578,6 +374,195 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "magnetic_pogo_conn.:MAGNETIC_POGO_CONN."
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0.508 4.826 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "MAGNETIC POGO CONN."
+				(at 0.508 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "BOREALIS:MAGNETIC POGO CONN."
+				(at 0.508 7.112 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "MAGNETIC_POGO_CONN._1_1"
+				(rectangle
+					(start -5.08 1.2954)
+					(end 7.112 1.27)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(arc
+					(start -5.08 -1.27)
+					(mid -6.35 0)
+					(end -5.08 1.27)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -5.08 -1.2446)
+					(end 7.112 -1.27)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(arc
+					(start 7.112 1.27)
+					(mid 8.382 0)
+					(end 7.112 -1.27)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(text "S"
+					(at -5.08 0 0)
+					(effects
+						(font
+							(size 1.27 1.27)
+							(thickness 0.254)
+							(bold yes)
+						)
+					)
+				)
+				(text "N"
+					(at 7.112 0 0)
+					(effects
+						(font
+							(size 1.27 1.27)
+							(thickness 0.254)
+							(bold yes)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -2.54 -3.81 90)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 0 -3.81 90)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 2.54 -3.81 90)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 5.08 -3.81 90)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:+3.3V"
 			(power)
 			(pin_numbers
@@ -931,18 +916,26 @@
 		)
 	)
 	(junction
+		(at 140.97 71.12)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "09963177-932f-40b3-8774-55a16d6d2f47")
+	)
+	(junction
 		(at 91.44 74.93)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "16f0307c-ebe7-4313-b97a-5bc1c332ac6d")
 	)
+	(junction
+		(at 160.02 67.31)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "8ab1a606-dbc1-426c-a09e-2eab62fc10bb")
+	)
 	(no_connect
 		(at 88.9 87.63)
 		(uuid "2bba5deb-16a2-4341-9279-c4c54e90ec3f")
-	)
-	(no_connect
-		(at 144.78 83.82)
-		(uuid "5b81331e-3f18-42d5-9a2d-959e4f38ce55")
 	)
 	(wire
 		(pts
@@ -956,6 +949,16 @@
 	)
 	(wire
 		(pts
+			(xy 167.64 72.39) (xy 177.8 72.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "04874a22-0c13-4196-befd-1d80809cd05a")
+	)
+	(wire
+		(pts
 			(xy 86.36 81.28) (xy 86.36 87.63)
 		)
 		(stroke
@@ -966,16 +969,6 @@
 	)
 	(wire
 		(pts
-			(xy 142.24 81.28) (xy 144.78 81.28)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "10873827-7803-497b-9baa-0000f0e86213")
-	)
-	(wire
-		(pts
 			(xy 91.44 62.23) (xy 91.44 66.04)
 		)
 		(stroke
@@ -983,6 +976,16 @@
 			(type default)
 		)
 		(uuid "3218c9a4-845a-450a-bd6f-66f3be000c22")
+	)
+	(wire
+		(pts
+			(xy 160.02 67.31) (xy 160.02 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3a5886c2-fc75-4a18-a032-718e5fe028fc")
 	)
 	(wire
 		(pts
@@ -1006,13 +1009,33 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 64.77) (xy 144.78 64.77)
+			(xy 142.24 63.5) (xy 135.89 63.5)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "6371c06a-dd4d-49b4-b094-b1cd8c5d5d26")
+		(uuid "44f6bfef-851b-46ac-8490-cce7c99c4f79")
+	)
+	(wire
+		(pts
+			(xy 160.02 74.93) (xy 140.97 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5e1c77ec-9d7f-4505-9ba1-58e5b20fed29")
+	)
+	(wire
+		(pts
+			(xy 140.97 74.93) (xy 140.97 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "68035420-92e4-4d8d-afaa-240e2e212473")
 	)
 	(wire
 		(pts
@@ -1026,6 +1049,16 @@
 	)
 	(wire
 		(pts
+			(xy 142.24 66.04) (xy 135.89 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7d326463-d188-4d6c-ad47-461c7728ca24")
+	)
+	(wire
+		(pts
 			(xy 91.44 74.93) (xy 91.44 76.2)
 		)
 		(stroke
@@ -1033,26 +1066,6 @@
 			(type default)
 		)
 		(uuid "909ce9d1-e107-4f36-aa1a-256967cfd738")
-	)
-	(wire
-		(pts
-			(xy 144.78 78.74) (xy 142.24 78.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b42d23ea-44ca-468a-af8a-8c79ec8faf72")
-	)
-	(wire
-		(pts
-			(xy 142.24 76.2) (xy 144.78 76.2)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b7ef0522-5749-48ca-a938-9300e227d712")
 	)
 	(wire
 		(pts
@@ -1074,15 +1087,65 @@
 		)
 		(uuid "b9f59740-5e06-4d46-80dc-4a5a676f4b8a")
 	)
+	(wire
+		(pts
+			(xy 142.24 68.58) (xy 135.89 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ea47291c-36a7-4dd9-b5fa-d566ab6c93fa")
+	)
+	(wire
+		(pts
+			(xy 135.89 71.12) (xy 140.97 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ef232b6b-a4e9-4e71-b9c4-0cf24f6273cf")
+	)
+	(wire
+		(pts
+			(xy 140.97 71.12) (xy 142.24 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fbbe8659-b3cb-4a56-b22f-322651a30362")
+	)
+	(wire
+		(pts
+			(xy 160.02 67.31) (xy 177.8 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ff940983-aecc-4a53-a029-b126ab75fa52")
+	)
+	(label "light"
+		(at 142.24 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0dc9957a-3ba3-4639-bb8b-11092c149ecd")
+	)
 	(label "ID"
-		(at 137.16 64.77 180)
+		(at 167.64 72.39 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "0f5d75fb-c033-4d84-87f8-82cc2d16bcb6")
+		(uuid "14b3bf75-927f-4099-948d-9af9098e1bcd")
 	)
 	(label "ADC"
 		(at 99.06 74.93 0)
@@ -1093,6 +1156,16 @@
 			(justify left bottom)
 		)
 		(uuid "22d2ac72-53ed-4318-9d9f-60a5e8f19782")
+	)
+	(label "SDA"
+		(at 142.24 66.04 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "44a840b3-323f-419e-b6ba-ba763a148697")
 	)
 	(label "ID"
 		(at 135.89 113.03 0)
@@ -1105,84 +1178,36 @@
 		(uuid "638181e7-6f2d-4cad-85a5-4e95fe1d401e")
 	)
 	(label "SCL"
-		(at 142.24 76.2 180)
+		(at 142.24 63.5 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "a169aca8-7a4b-430d-9736-72836f379496")
-	)
-	(label "SDA"
-		(at 142.24 78.74 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "af8394e3-86fd-46e5-886c-197756335096")
+		(uuid "976aedbb-518b-41a1-b6ea-35856512c3d5")
 	)
 	(label "ADC"
-		(at 142.24 81.28 180)
+		(at 142.24 68.58 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "fdb94874-4432-48a6-aa3a-2678c8085ab0")
+		(uuid "eecc7283-8833-4d1a-9545-3ad91cfc98ff")
 	)
 	(symbol
-		(lib_id "878-22-004-10-011101:878-22-004-10-011101")
-		(at 144.78 57.15 0)
+		(lib_id "power:+3.3V")
+		(at 160.02 67.31 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "2f543c49-dc18-4be6-a201-2b5ef413dfe1")
-		(property "Reference" "J4"
-			(at 161.29 59.6899 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "878-22-004-10-011101"
-			(at 143.51 52.324 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "BOREALIS:8782200410011101"
-			(at 161.29 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.mill-max.com/products/spring-loaded/slc-pin-header-strip/878-xx-xxx-10-011101/878-22-004-10-011101?s_term=878-22-004-10-011101&s_type=Quick/Product/Part%20Number%20Search"
-			(at 161.29 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Description" "Headers & Wire Housings Magnetic Spring-Loaded Pin Header Strip 4 Pins"
-			(at 144.78 57.15 0)
+		(uuid "09434aa4-6cb1-4052-9099-6aec7742777b")
+		(property "Reference" "#PWR08"
+			(at 163.83 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1190,82 +1215,116 @@
 				(hide yes)
 			)
 		)
-		(property "Description_1" "Headers & Wire Housings Magnetic Spring-Loaded Pin Header Strip 4 Pins"
-			(at 161.29 59.69 0)
+		(property "Value" "+3.3V"
+			(at 156.21 67.3099 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
-		(property "Height" "9.6"
-			(at 161.29 62.23 0)
+		(property "Footprint" ""
+			(at 160.02 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 				(hide yes)
 			)
 		)
-		(property "Mouser Part Number" "575-8782200410010000"
-			(at 161.29 64.77 0)
+		(property "Datasheet" ""
+			(at 160.02 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 				(hide yes)
 			)
 		)
-		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Mill-Max/878-22-004-10-011101?qs=t7xnP681wgWdOYPvR3%252B%2FbA%3D%3D"
-			(at 161.29 67.31 0)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 160.02 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 				(hide yes)
 			)
-		)
-		(property "Manufacturer_Name" "Mill-Max"
-			(at 161.29 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer_Part_Number" "878-22-004-10-011101"
-			(at 161.29 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "e23b2bd7-c4e3-437d-b762-3c8c49876110")
 		)
 		(pin "1"
-			(uuid "85491e13-f00f-49d9-b34b-a4a6b51b3c29")
-		)
-		(pin "4"
-			(uuid "66aa9c3d-5dda-47c4-b5c8-242cc99e23a9")
-		)
-		(pin "2"
-			(uuid "e6f49cb2-06bc-47e1-8963-1b6026c94ae4")
+			(uuid "f1c0f217-ec3e-4bb8-9617-7966660aa6fb")
 		)
 		(instances
 			(project "sensor-board-ozone"
 				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
-					(reference "J4")
+					(reference "#PWR08")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 177.8 64.77 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "290c42ca-cd4a-4d6b-a04b-8d6a9065d3ca")
+		(property "Reference" "#PWR010"
+			(at 171.45 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 173.99 64.7699 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 177.8 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 177.8 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 177.8 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c76c16fb-7351-47a9-b5c5-ca70e3fc88a6")
+		)
+		(instances
+			(project "sensor-board-ozone"
+				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
+					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -1342,73 +1401,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 144.78 57.15 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6ef7700d-db51-4332-a473-11f1b1573777")
-		(property "Reference" "#PWR08"
-			(at 138.43 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 140.97 57.1499 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" ""
-			(at 144.78 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 144.78 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 144.78 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ad0957f7-0a26-48d4-9621-6156c70f84e1")
-		)
-		(instances
-			(project "sensor-board-ozone"
-				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
-					(reference "#PWR08")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:+3.3V")
 		(at 135.89 100.33 0)
 		(unit 1)
@@ -1475,6 +1467,156 @@
 		)
 	)
 	(symbol
+		(lib_id "magnetic_pogo_conn.:MAGNETIC_POGO_CONN.")
+		(at 181.61 67.31 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "78e81275-df60-4179-8732-e0b513b0e8fc")
+		(property "Reference" "U3"
+			(at 184.15 67.0559 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MAGNETIC POGO CONN."
+			(at 184.15 69.5959 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "batteryholder:MAGNETIC POGO CONN."
+			(at 188.722 67.818 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 181.61 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 181.61 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "d1904f67-301a-4728-a322-57f31a6c677c")
+		)
+		(pin "3"
+			(uuid "37fe9e5e-c3a3-4153-990a-872fb28b2c19")
+		)
+		(pin "1"
+			(uuid "2c0bda69-3563-4434-99e5-d3e59e83d768")
+		)
+		(pin "4"
+			(uuid "a6ef18a1-9238-4fee-9af0-fb519af3fb02")
+		)
+		(instances
+			(project "sensor-board-ozone"
+				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
+					(reference "U3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "magnetic_pogo_conn.:MAGNETIC_POGO_CONN.")
+		(at 132.08 68.58 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "7c9fae65-f016-4276-810b-00f3c2ff3dbd")
+		(property "Reference" "U2"
+			(at 132.0673 55.88 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "MAGNETIC POGO CONN."
+			(at 132.0673 58.42 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "batteryholder:MAGNETIC POGO CONN."
+			(at 124.968 68.072 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 132.08 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "82ed2235-dbca-4728-91b5-2237244d5f0e")
+		)
+		(pin "3"
+			(uuid "54672337-a259-472f-8ca1-788f29c1f5ab")
+		)
+		(pin "1"
+			(uuid "49fdc22c-d2c3-4dc6-be48-59d1c199aaa9")
+		)
+		(pin "4"
+			(uuid "686b9b65-704e-47d8-acd3-44ffbe3a66fa")
+		)
+		(instances
+			(project "sensor-board-ozone"
+				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
+					(reference "U2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector:Conn_01x04_Pin")
 		(at 86.36 92.71 90)
 		(unit 1)
@@ -1500,7 +1642,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
 			(at 86.36 92.71 0)
 			(effects
 				(font
@@ -1543,72 +1685,6 @@
 			(project ""
 				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
 					(reference "J2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 144.78 59.69 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "a04f1a36-2f98-4e55-ab8e-1b3e6eff6121")
-		(property "Reference" "#PWR010"
-			(at 148.59 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3.3V"
-			(at 140.97 59.6899 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 144.78 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 144.78 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 144.78 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "0b95f54b-3488-431a-9f15-b4c24c5967e8")
-		)
-		(instances
-			(project "sensor-board-ozone"
-				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
-					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -1819,16 +1895,16 @@
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 144.78 62.23 90)
+		(at 177.8 69.85 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "cb578758-4b28-44bb-9f55-7b91bc7e01ed")
-		(property "Reference" "#PWR016"
-			(at 148.59 62.23 0)
+		(uuid "dbabe486-2adf-41b9-ad16-ab1309a7b777")
+		(property "Reference" "#PWR012"
+			(at 181.61 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1837,7 +1913,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 140.97 62.2299 90)
+			(at 173.99 69.8499 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1846,7 +1922,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 144.78 62.23 0)
+			(at 177.8 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1855,7 +1931,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 144.78 62.23 0)
+			(at 177.8 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1864,7 +1940,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 144.78 62.23 0)
+			(at 177.8 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1873,149 +1949,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "dc05ad1e-fc38-4a8d-aed2-1add6de683f9")
+			(uuid "bf785cf4-8a9f-41d1-8bd8-f99b2519726b")
 		)
 		(instances
 			(project "sensor-board-ozone"
 				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
-					(reference "#PWR016")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "878-22-004-10-011101:878-22-004-10-011101")
-		(at 144.78 76.2 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "dd2ead24-6964-4e5a-a0ac-62dcc46de674")
-		(property "Reference" "J7"
-			(at 161.29 78.7399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "878-22-004-10-011101"
-			(at 141.986 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "BOREALIS:8782200410011101"
-			(at 161.29 73.66 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.mill-max.com/products/spring-loaded/slc-pin-header-strip/878-xx-xxx-10-011101/878-22-004-10-011101?s_term=878-22-004-10-011101&s_type=Quick/Product/Part%20Number%20Search"
-			(at 161.29 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Description" "Headers & Wire Housings Magnetic Spring-Loaded Pin Header Strip 4 Pins"
-			(at 144.78 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description_1" "Headers & Wire Housings Magnetic Spring-Loaded Pin Header Strip 4 Pins"
-			(at 161.29 78.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Height" "9.6"
-			(at 161.29 81.28 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Mouser Part Number" "575-8782200410010000"
-			(at 161.29 83.82 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Mill-Max/878-22-004-10-011101?qs=t7xnP681wgWdOYPvR3%252B%2FbA%3D%3D"
-			(at 161.29 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer_Name" "Mill-Max"
-			(at 161.29 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer_Part_Number" "878-22-004-10-011101"
-			(at 161.29 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "10346164-ddbb-4249-acf1-d17dbf34e3b9")
-		)
-		(pin "1"
-			(uuid "617f8c43-4f53-4cee-9f2c-2c84cae04892")
-		)
-		(pin "4"
-			(uuid "2578f146-d677-4c00-abea-c78fcc948d7b")
-		)
-		(pin "2"
-			(uuid "9fd7d52a-fbf6-4138-9e13-ef062c4d4b77")
-		)
-		(instances
-			(project "sensor-board-ozone"
-				(path "/02d62f2f-c7cc-4984-8541-1469cdc83313"
-					(reference "J7")
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)

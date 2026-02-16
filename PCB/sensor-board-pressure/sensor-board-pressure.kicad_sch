@@ -1279,6 +1279,18 @@
 		(uuid "46c8f191-6067-4005-8fae-894cac87e24d")
 	)
 	(junction
+		(at 162.56 67.31)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "4aedf182-6535-4b28-b70a-a916e56eae17")
+	)
+	(junction
+		(at 143.51 71.12)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "4b747789-99fd-4a66-b01b-961c8f634b01")
+	)
+	(junction
 		(at 86.36 83.82)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1306,10 +1318,6 @@
 		(at 73.66 86.36)
 		(uuid "907b2876-a81e-4815-bbf8-e849ba65572b")
 	)
-	(no_connect
-		(at 120.65 63.5)
-		(uuid "d9b4e8d4-3d70-441b-bfc6-bf1f267d5cd0")
-	)
 	(wire
 		(pts
 			(xy 41.91 78.74) (xy 41.91 83.82)
@@ -1329,16 +1337,6 @@
 			(type default)
 		)
 		(uuid "0bd63635-1d6d-41fa-ae92-02e8dfb820c5")
-	)
-	(wire
-		(pts
-			(xy 152.4 64.77) (xy 162.56 64.77)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "12c3f21d-49f9-45ed-85c3-420b5ba043a5")
 	)
 	(wire
 		(pts
@@ -1382,16 +1380,6 @@
 	)
 	(wire
 		(pts
-			(xy 127 60.96) (xy 120.65 60.96)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3bed3649-50ed-4996-a331-e759658c0231")
-	)
-	(wire
-		(pts
 			(xy 45.72 68.58) (xy 41.91 68.58)
 		)
 		(stroke
@@ -1422,16 +1410,6 @@
 	)
 	(wire
 		(pts
-			(xy 127 58.42) (xy 120.65 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6671fdbd-f99d-4772-998e-c5bed93a1465")
-	)
-	(wire
-		(pts
 			(xy 86.36 81.28) (xy 86.36 83.82)
 		)
 		(stroke
@@ -1449,6 +1427,16 @@
 			(type default)
 		)
 		(uuid "7197acb2-8b23-4ea5-9734-544bb9edb5a7")
+	)
+	(wire
+		(pts
+			(xy 170.18 72.39) (xy 180.34 72.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7488bfa3-fce3-4916-bfc4-449127afcffe")
 	)
 	(wire
 		(pts
@@ -1482,6 +1470,16 @@
 	)
 	(wire
 		(pts
+			(xy 144.78 68.58) (xy 138.43 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "852f5bbc-e786-45bd-8159-52408e4b56a3")
+	)
+	(wire
+		(pts
 			(xy 73.66 78.74) (xy 77.47 78.74)
 		)
 		(stroke
@@ -1489,6 +1487,66 @@
 			(type default)
 		)
 		(uuid "86aa203d-f606-4d99-9a32-f377f732c073")
+	)
+	(wire
+		(pts
+			(xy 144.78 63.5) (xy 138.43 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "920679d5-f5ca-42dd-8daa-d5899222893d")
+	)
+	(wire
+		(pts
+			(xy 162.56 67.31) (xy 162.56 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "96b0f702-27ac-49a5-ab79-3707ec6f9563")
+	)
+	(wire
+		(pts
+			(xy 143.51 71.12) (xy 144.78 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9a381afc-8e6e-42cd-b66c-0125467418bb")
+	)
+	(wire
+		(pts
+			(xy 162.56 67.31) (xy 180.34 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9f294c34-64db-404f-86c3-07a37c32f720")
+	)
+	(wire
+		(pts
+			(xy 143.51 74.93) (xy 143.51 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9f9b7c0c-71e5-4695-94a4-df9bd793fa75")
+	)
+	(wire
+		(pts
+			(xy 144.78 66.04) (xy 138.43 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a2f2c870-65e8-48cf-b439-d8494e36889e")
 	)
 	(wire
 		(pts
@@ -1522,13 +1580,13 @@
 	)
 	(wire
 		(pts
-			(xy 127 55.88) (xy 120.65 55.88)
+			(xy 162.56 74.93) (xy 143.51 74.93)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d6102272-d1df-4e50-99af-de966f5dec90")
+		(uuid "e0855eb2-e388-4b13-98bb-034b6943436c")
 	)
 	(wire
 		(pts
@@ -1549,6 +1607,16 @@
 			(type default)
 		)
 		(uuid "ea822227-6d7b-4e9b-8134-e050ffee4dd7")
+	)
+	(wire
+		(pts
+			(xy 138.43 71.12) (xy 143.51 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ef46c9b6-8437-4304-9779-cc2560089a34")
 	)
 	(wire
 		(pts
@@ -1600,15 +1668,15 @@
 		)
 		(uuid "050f27a7-767a-4986-a886-d8d8b464e898")
 	)
-	(label "ID"
-		(at 152.4 64.77 180)
+	(label "SCL"
+		(at 144.78 63.5 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "3485f06f-77e1-4ea4-9c0b-30f0f7f81731")
+		(uuid "4428b90d-b00c-432e-be51-e3b7de56d91a")
 	)
 	(label "SDA"
 		(at 31.75 86.36 0)
@@ -1621,34 +1689,24 @@
 		(uuid "53fc6c18-1b36-4208-aa12-faa7568eed2c")
 	)
 	(label "ADC"
-		(at 127 60.96 180)
+		(at 144.78 68.58 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "7e6fd5bc-cbee-4973-b644-76c9ae823750")
+		(uuid "6711b25e-8c11-4766-a3e3-7a4aa6e277f5")
 	)
-	(label "SCL"
-		(at 127 55.88 180)
+	(label "ID"
+		(at 170.18 72.39 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "c67db188-4aab-4209-8218-627b648eb3b6")
-	)
-	(label "SDA"
-		(at 127 58.42 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "d1bbd68f-c219-4052-9f27-9e9c39e067d4")
+		(uuid "b2aafce1-7a05-4470-81d5-d014b2d35790")
 	)
 	(label "SCL"
 		(at 17.78 81.28 0)
@@ -1659,6 +1717,93 @@
 			(justify left bottom)
 		)
 		(uuid "debd819d-5627-43ac-b1d8-8f17678c22fe")
+	)
+	(label "light"
+		(at 144.78 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e045eb15-edfc-4548-a90c-7b627f3f177c")
+	)
+	(label "SDA"
+		(at 144.78 66.04 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "f6cc04b7-7444-40b3-9b88-259240690810")
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 180.34 69.85 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "17f7a785-7f28-499b-89db-0408462b678f")
+		(property "Reference" "#PWR010"
+			(at 184.15 69.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 176.53 69.8499 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 180.34 69.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 180.34 69.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 180.34 69.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "81288627-c644-44b3-9174-18e3ac50efe9")
+		)
+		(instances
+			(project "sensor-board-pressure"
+				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
+					(reference "#PWR010")
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id "power:+3.3V")
@@ -1721,6 +1866,72 @@
 			(project "sensor-board-pressure"
 				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
 					(reference "#PWR09")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 162.56 67.31 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2d9c9871-c49c-40b6-9738-16090b4a6042")
+		(property "Reference" "#PWR04"
+			(at 166.37 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 158.75 67.3099 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 162.56 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 162.56 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 162.56 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "19edd340-5327-4fc6-8ab8-702c752743b7")
+		)
+		(instances
+			(project "sensor-board-pressure"
+				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
+					(reference "#PWR04")
 					(unit 1)
 				)
 			)
@@ -2150,7 +2361,7 @@
 	)
 	(symbol
 		(lib_id "magnetic_pogo_conn.:MAGNETIC_POGO_CONN.")
-		(at 116.84 60.96 90)
+		(at 134.62 68.58 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2159,7 +2370,7 @@
 		(fields_autoplaced yes)
 		(uuid "67c26bf4-7c2c-453d-b3b1-8f46fe97cff9")
 		(property "Reference" "U1"
-			(at 116.8273 48.26 90)
+			(at 134.6073 55.88 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2167,7 +2378,7 @@
 			)
 		)
 		(property "Value" "MAGNETIC POGO CONN."
-			(at 116.8273 50.8 90)
+			(at 134.6073 58.42 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2175,7 +2386,7 @@
 			)
 		)
 		(property "Footprint" "batteryholder:MAGNETIC POGO CONN."
-			(at 109.728 60.452 0)
+			(at 127.508 68.072 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2184,7 +2395,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 116.84 60.96 0)
+			(at 134.62 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2193,7 +2404,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 116.84 60.96 0)
+			(at 134.62 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2217,72 +2428,6 @@
 			(project "sensor-board-pressure"
 				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
 					(reference "U1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 162.56 59.69 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "6b41c206-31b6-4df7-9e52-5538f3b09823")
-		(property "Reference" "#PWR010"
-			(at 166.37 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3.3V"
-			(at 158.75 59.6899 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 162.56 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 162.56 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 162.56 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "bf83810e-2b5b-42a5-ab38-9f7e7868c24f")
-		)
-		(instances
-			(project "sensor-board-pressure"
-				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
-					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -2356,7 +2501,7 @@
 	)
 	(symbol
 		(lib_id "magnetic_pogo_conn.:MAGNETIC_POGO_CONN.")
-		(at 166.37 59.69 270)
+		(at 184.15 67.31 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2365,7 +2510,7 @@
 		(fields_autoplaced yes)
 		(uuid "78e81275-df60-4179-8732-e0b513b0e8fc")
 		(property "Reference" "U2"
-			(at 168.91 59.4359 90)
+			(at 186.69 67.0559 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2374,7 +2519,7 @@
 			)
 		)
 		(property "Value" "MAGNETIC POGO CONN."
-			(at 168.91 61.9759 90)
+			(at 186.69 69.5959 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2383,7 +2528,7 @@
 			)
 		)
 		(property "Footprint" "batteryholder:MAGNETIC POGO CONN."
-			(at 173.482 60.198 0)
+			(at 191.262 67.818 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2392,7 +2537,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 166.37 59.69 0)
+			(at 184.15 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2401,7 +2546,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 166.37 59.69 0)
+			(at 184.15 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2497,6 +2642,73 @@
 			(project "sensor-board-pressure"
 				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
 					(reference "C5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 180.34 64.77 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "817363b6-1808-4297-b144-958d29bbd570")
+		(property "Reference" "#PWR08"
+			(at 173.99 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 176.53 64.7699 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 180.34 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 180.34 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 180.34 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1475f6c1-80f8-4913-95e0-20e9b320e964")
+		)
+		(instances
+			(project "sensor-board-pressure"
+				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
+					(reference "#PWR08")
 					(unit 1)
 				)
 			)
@@ -2915,73 +3127,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 162.56 57.15 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "eb962d39-6123-4dba-af42-b53eb95e5d7d")
-		(property "Reference" "#PWR08"
-			(at 156.21 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 158.75 57.1499 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" ""
-			(at 162.56 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 162.56 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 162.56 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f12161d0-bc47-4c98-bdac-6b39485a7610")
-		)
-		(instances
-			(project "sensor-board-pressure"
-				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
-					(reference "#PWR08")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 92.71 106.68 0)
 		(unit 1)
@@ -3046,73 +3191,6 @@
 			(project ""
 				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
 					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 162.56 62.23 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "f5fe7d6e-cdc6-469e-9013-f9e93f4261ca")
-		(property "Reference" "#PWR013"
-			(at 166.37 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 158.75 62.2299 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 162.56 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 162.56 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 162.56 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "3e74d705-c947-4b72-8075-d46d6b68c446")
-		)
-		(instances
-			(project "sensor-board-pressure"
-				(path "/073ec1fb-7e7a-4821-a0d2-1e02de7627d5"
-					(reference "#PWR013")
 					(unit 1)
 				)
 			)
