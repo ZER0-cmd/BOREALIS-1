@@ -1282,6 +1282,10 @@
 		(at 44.45 87.63)
 		(uuid "9272cec8-7168-46a8-a699-2a800ba09942")
 	)
+	(no_connect
+		(at 72.39 87.63)
+		(uuid "a30f9976-3045-4bb7-80f3-aee13a58b26d")
+	)
 	(wire
 		(pts
 			(xy 72.39 82.55) (xy 72.39 85.09)
@@ -1311,16 +1315,6 @@
 			(type default)
 		)
 		(uuid "27b72bfd-d119-449c-9c41-9f278c4d7f5c")
-	)
-	(wire
-		(pts
-			(xy 86.36 87.63) (xy 88.9 87.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "297bfb7c-9a3f-45a9-a6bb-370421d50848")
 	)
 	(wire
 		(pts
@@ -1451,16 +1445,6 @@
 			(type default)
 		)
 		(uuid "9f982dce-2383-40dc-9051-6526e56fdfd3")
-	)
-	(wire
-		(pts
-			(xy 72.39 87.63) (xy 78.74 87.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a8edfba6-6766-433f-9f74-8303ac9370ff")
 	)
 	(wire
 		(pts
@@ -2664,73 +2648,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+3.3V")
-		(at 88.9 87.63 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "c646fb19-52b8-4be7-88ef-404b689efb82")
-		(property "Reference" "#PWR05"
-			(at 85.09 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3.3V"
-			(at 92.71 87.6299 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 88.9 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 88.9 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 88.9 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "1756abf0-afbb-44c4-ad36-71bf800acffd")
-		)
-		(instances
-			(project ""
-				(path "/1e18ea01-e475-4e52-a7c5-dcf1edca7087"
-					(reference "#PWR05")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 25.4 85.09 270)
 		(unit 1)
@@ -2929,74 +2846,6 @@
 			(project "sensor-board-humidity"
 				(path "/1e18ea01-e475-4e52-a7c5-dcf1edca7087"
 					(reference "#PWR012")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 82.55 87.63 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "e7f7dce7-720b-4e4f-a547-fde13d369e2c")
-		(property "Reference" "R2"
-			(at 82.55 81.28 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 82.55 83.82 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 82.55 89.408 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 82.55 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 82.55 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "8edcd609-302a-4d00-b1e8-9c67d8c263c9")
-		)
-		(pin "1"
-			(uuid "84c86bba-67ff-4077-a2a6-e9bc288e6e41")
-		)
-		(instances
-			(project ""
-				(path "/1e18ea01-e475-4e52-a7c5-dcf1edca7087"
-					(reference "R2")
 					(unit 1)
 				)
 			)

@@ -487,10 +487,10 @@
       "gencad": "",
       "idf": "",
       "netlist": "sensor-board-solar.net",
-      "plot": "",
+      "plot": "../../../test gerber/",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "sensor-board-solar.step",
       "svg": "",
       "vrml": ""
     },

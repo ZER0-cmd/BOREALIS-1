@@ -1434,7 +1434,7 @@
 		)
 	)
 	(rectangle
-		(start 22.86 27.94)
+		(start 15.24 27.94)
 		(end 92.71 77.47)
 		(stroke
 			(width 0)
@@ -1462,10 +1462,16 @@
 		(uuid "040346b7-b9e9-4357-9166-10ab74855381")
 	)
 	(junction
-		(at 30.48 66.04)
+		(at 27.94 66.04)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "188edf2d-afc6-47df-9cff-08f94be3bed1")
+		(uuid "1515be01-8a4f-4f26-8ba6-7352761ba1cb")
+	)
+	(junction
+		(at 27.94 73.66)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "37388db8-288f-4443-a623-9dc63ea48b9d")
 	)
 	(junction
 		(at 144.78 101.6)
@@ -1480,6 +1486,12 @@
 		(uuid "58c8c0ff-0fea-418e-9de7-e2755cd84490")
 	)
 	(junction
+		(at 21.59 73.66)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "79a57fa7-e7b0-4305-bf33-9df546d554e8")
+	)
+	(junction
 		(at 163.83 55.88)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1492,10 +1504,10 @@
 		(uuid "bf21e8a2-f1ea-423b-89d2-6fb35aaecce6")
 	)
 	(junction
-		(at 30.48 73.66)
+		(at 21.59 66.04)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "dabfca9a-76a0-4e63-a24d-48d63f0f8585")
+		(uuid "c08b6026-86b0-41c5-bebf-8cc6302771d7")
 	)
 	(junction
 		(at 123.19 101.6)
@@ -1529,6 +1541,16 @@
 	)
 	(wire
 		(pts
+			(xy 27.94 66.04) (xy 33.02 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0ad1a5f3-9f62-4d28-8b22-afbaf8cad8c6")
+	)
+	(wire
+		(pts
 			(xy 138.43 104.14) (xy 125.73 104.14)
 		)
 		(stroke
@@ -1556,6 +1578,16 @@
 			(type default)
 		)
 		(uuid "285200d2-4248-434f-bf2b-8b8b6ee84c7b")
+	)
+	(wire
+		(pts
+			(xy 21.59 73.66) (xy 27.94 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "347bf613-6489-4a24-a91e-3415920f38b4")
 	)
 	(wire
 		(pts
@@ -1619,6 +1651,16 @@
 	)
 	(wire
 		(pts
+			(xy 21.59 66.04) (xy 27.94 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "73f07e95-bfcc-4e21-80f1-7e0143c4871d")
+	)
+	(wire
+		(pts
 			(xy 128.27 107.95) (xy 128.27 110.49)
 		)
 		(stroke
@@ -1646,16 +1688,6 @@
 			(type default)
 		)
 		(uuid "7de5c882-3e0d-4cf9-aa54-fd976043c3ae")
-	)
-	(wire
-		(pts
-			(xy 30.48 73.66) (xy 39.37 73.66)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7e4b19ef-98ac-4593-9606-f853d1193a47")
 	)
 	(wire
 		(pts
@@ -1759,7 +1791,7 @@
 	)
 	(wire
 		(pts
-			(xy 25.4 73.66) (xy 30.48 73.66)
+			(xy 16.51 73.66) (xy 21.59 73.66)
 		)
 		(stroke
 			(width 0)
@@ -1799,6 +1831,16 @@
 	)
 	(wire
 		(pts
+			(xy 27.94 73.66) (xy 39.37 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b6dc6ee6-7ee1-4b52-8904-fd7293f9bf95")
+	)
+	(wire
+		(pts
 			(xy 163.83 55.88) (xy 163.83 63.5)
 		)
 		(stroke
@@ -1819,7 +1861,7 @@
 	)
 	(wire
 		(pts
-			(xy 25.4 66.04) (xy 30.48 66.04)
+			(xy 16.51 66.04) (xy 21.59 66.04)
 		)
 		(stroke
 			(width 0)
@@ -1899,16 +1941,6 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 66.04) (xy 33.02 66.04)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f8d031ee-a95e-487d-8d32-5a0ef2968dc8")
-	)
-	(wire
-		(pts
 			(xy 66.04 71.12) (xy 66.04 60.96)
 		)
 		(stroke
@@ -1978,7 +2010,7 @@
 		(uuid "1382ebe3-f064-4a6a-93e6-234adb76c061")
 	)
 	(label "3.3v"
-		(at 25.4 66.04 0)
+		(at 16.51 66.04 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2088,7 +2120,7 @@
 		(uuid "d420e7d0-49a2-4fef-8b08-740a3d207e5c")
 	)
 	(label "GND"
-		(at 25.4 73.66 0)
+		(at 16.51 73.66 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2106,6 +2138,77 @@
 			(justify left bottom)
 		)
 		(uuid "f3d6893b-55b8-41e4-85e9-bc14498ad4c3")
+	)
+	(symbol
+		(lib_id "2026-01-23_05-30-51:C0603C104K5RACTU")
+		(at 27.94 73.66 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "04f9bbe7-16a9-48f9-900c-757db1d0b3e4")
+		(property "Reference" "C2"
+			(at 31.75 68.5799 90)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "4.7uF"
+			(at 29.21 75.184 90)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 27.94 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://content.kemet.com/datasheets/KEM_C1002_X7R_SMD.pdf"
+			(at 27.94 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 27.94 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "156f58a0-deb3-424b-83ab-a38f126d012a")
+		)
+		(pin "2"
+			(uuid "905824f2-6728-459e-9d93-cffec31c6cf7")
+		)
+		(instances
+			(project "sensor-board-light"
+				(path "/726314c5-8b2a-4d92-8d4d-3d9717bee1d8"
+					(reference "C2")
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id "power:+3.3V")
@@ -2241,16 +2344,15 @@
 	)
 	(symbol
 		(lib_id "2026-01-23_05-30-51:C0603C104K5RACTU")
-		(at 30.48 73.66 90)
+		(at 21.59 73.66 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "223025d5-54d8-41aa-a0bf-13bf6be555a6")
 		(property "Reference" "C1"
-			(at 34.29 68.5799 90)
+			(at 21.336 62.992 90)
 			(effects
 				(font
 					(size 1.524 1.524)
@@ -2258,8 +2360,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "100nF"
-			(at 34.29 71.1199 90)
+		(property "Value" "0.1uF"
+			(at 19.05 75.946 90)
 			(effects
 				(font
 					(size 1.524 1.524)
@@ -2268,7 +2370,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 30.48 73.66 0)
+			(at 21.59 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2278,7 +2380,7 @@
 			)
 		)
 		(property "Datasheet" "https://content.kemet.com/datasheets/KEM_C1002_X7R_SMD.pdf"
-			(at 30.48 73.66 0)
+			(at 21.59 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2288,7 +2390,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 30.48 73.66 0)
+			(at 21.59 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)

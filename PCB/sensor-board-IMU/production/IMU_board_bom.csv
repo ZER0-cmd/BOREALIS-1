@@ -1,0 +1,7 @@
+﻿Designator,Footprint,Quantity,Value,LCSC Part #
+"C1, C5",0805,2,0.1uF,
+C2,0805,1,10nF,
+MPU6500,mpu6500,1,~,
+R1,0805,1,R,
+"R2, R3",0805,2,4.7k,
+"U1, U2",MAGNETIC POGO CONN.,2,MAGNETIC POGO CONN.,

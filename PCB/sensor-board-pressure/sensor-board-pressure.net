@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "C:\\Users\\Gitan\\Downloads\\BOREALIS-1\\PCB\\sensor-board-pressure\\sensor-board-pressure.kicad_sch")
-    (date "2026-02-15T23:29:00+0100")
+    (date "2026-02-17T17:37:10+0100")
     (tool "Eeschema 9.0.6")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block

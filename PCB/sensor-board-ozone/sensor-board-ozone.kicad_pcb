@@ -1199,6 +1199,7 @@
 		(property "Reference" "J2"
 			(at 0 2.38 90)
 			(layer "B.SilkS")
+			(hide yes)
 			(uuid "7f7b0a93-30c4-4b19-a85a-daba9bcb4e1b")
 			(effects
 				(font
@@ -1758,7 +1759,7 @@
 			(justify top mirror)
 		)
 	)
-	(gr_text "Gas Sensor"
+	(gr_text "GAS SENSOR"
 		(at 122.274998 59.979998 0)
 		(layer "B.SilkS" knockout)
 		(uuid "e903cec6-7cfb-48a6-8fc6-6661bda6720c")

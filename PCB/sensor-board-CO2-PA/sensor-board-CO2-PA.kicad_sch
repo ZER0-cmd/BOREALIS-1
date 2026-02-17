@@ -1483,6 +1483,12 @@
 		(uuid "87fb22f6-8771-4d38-a116-9f161e6f1278")
 	)
 	(junction
+		(at 90.17 48.26)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b93b4edc-931a-4dc4-b27c-80f0924e34fd")
+	)
+	(junction
 		(at 88.9 96.52)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1576,7 +1582,7 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 55.88) (xy 90.17 39.37)
+			(xy 90.17 55.88) (xy 90.17 48.26)
 		)
 		(stroke
 			(width 0)
@@ -1636,6 +1642,16 @@
 	)
 	(wire
 		(pts
+			(xy 114.3 48.26) (xy 123.19 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3020c10f-8c26-42c9-823f-2f6ddae47c86")
+	)
+	(wire
+		(pts
 			(xy 140.97 72.39) (xy 146.05 72.39)
 		)
 		(stroke
@@ -1653,6 +1669,16 @@
 			(type default)
 		)
 		(uuid "34510157-2a88-46c8-8634-f6523d0b283b")
+	)
+	(wire
+		(pts
+			(xy 90.17 48.26) (xy 106.68 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "37497bd4-545a-4aa6-bca5-5ec725f419ea")
 	)
 	(wire
 		(pts
@@ -1763,6 +1789,16 @@
 			(type default)
 		)
 		(uuid "773188da-5ea3-4978-898b-2fad6f200def")
+	)
+	(wire
+		(pts
+			(xy 90.17 39.37) (xy 90.17 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7f038f46-fa37-440f-98aa-b5089ca7ac41")
 	)
 	(wire
 		(pts
@@ -2206,6 +2242,143 @@
 		)
 	)
 	(symbol
+		(lib_id "2026-01-23_05-30-51:C0603C104K5RACTU")
+		(at 114.3 48.26 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "5f53037c-3cd8-41f7-9fe0-a67f60412dd5")
+		(property "Reference" "C2"
+			(at 110.49 41.91 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+			)
+		)
+		(property "Value" "0.1uf"
+			(at 110.49 44.45 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 114.3 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://content.kemet.com/datasheets/KEM_C1002_X7R_SMD.pdf"
+			(at 114.3 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 114.3 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2aacf66a-abbd-4101-b2ae-0c46648427b8")
+		)
+		(pin "2"
+			(uuid "8298027e-1d45-472a-aa92-778501d6a5b0")
+		)
+		(instances
+			(project "sensor-board-CO2-PA"
+				(path "/4dc67bc0-6b27-441a-860a-e697f5d15d5c"
+					(reference "C2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 123.19 48.26 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "70f3fd6b-f5a2-42b1-af0f-016878585f4d")
+		(property "Reference" "#PWR08"
+			(at 129.54 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 127 48.2599 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 123.19 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 123.19 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 123.19 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3ea1cd03-a5cb-4fb7-b377-aa1b121a1ca8")
+		)
+		(instances
+			(project "sensor-board-CO2-PA"
+				(path "/4dc67bc0-6b27-441a-860a-e697f5d15d5c"
+					(reference "#PWR08")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3.3V")
 		(at 139.7 92.71 0)
 		(unit 1)
@@ -2638,7 +2811,7 @@
 				)
 			)
 		)
-		(property "Value" "10microf"
+		(property "Value" "10uf"
 			(at 110.49 31.75 0)
 			(effects
 				(font
