@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from numpy import *
 import csv
+from copy import copy
 
 class getter:
     def __init__(self, headers, y):
@@ -34,7 +35,7 @@ class getter:
         return self[index].mean()
 
 class read:
-    def __init__(self, path:str = 'data.csv', x:str='alt'):
+    def __init__(self, path:str = 'data.csv', x:str='Elevation_m'):
         self.x = []
         self.y = []
         with open(path, 'r') as file:
@@ -54,13 +55,11 @@ class read:
             self.y[index] -= self.y[index][0]
 
 class plotter:
-    def __init__(self, data:read, ft:tuple=None, *, x:bool=None, name:bool=None):
-        self.data = data
+    def __init__(self, data:read, ft:tuple=None, name:bool=None):
+        self.data = copy(data)
         self.dict = {}
         self.plots = []
         self.name = name
-        if x is not None:
-            self.data.x = x
         mask = slice(None) if ft is None else (ft[0] <= self.data.x) & (self.data.x <= ft[1])
         self.data.x = self.data.x[mask]
         self.data.y = self.data.y.values().T[mask].T
@@ -120,6 +119,8 @@ class plotter:
         fig, ax = plt.subplots(label=self.name)
         for p in self.dict.values():
             color = ax._get_lines.get_next_color()
+            if p[0] is None and p[1] is not None:
+                p[1] = None
             if p[0] is not None:
                 ax.plot(self.data.x, p[0], label=p[2], color=color)
             if p[1] is not None:
