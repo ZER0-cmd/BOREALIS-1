@@ -4,40 +4,32 @@ import csv
 from copy import copy
 
 class getter:
-    def __init__(self, headers, y):
+    def __init__(self, headers, values):
         self.headers = headers
-        self.y = y
+        self.values = values
 
     def __add__(self, term):
-        return getter(self.headers, self.y + term)
+        return getter(self.headers, self.values + term)
     def __sub__(self, term):
-        return getter(self.headers, self.y - term)
+        return getter(self.headers, self.values - term)
     def __mul__(self, factor):
-        return getter(self.headers, self.y * factor)
+        return getter(self.headers, self.values * factor)
     def __truediv__(self, term):
-        return getter(self.headers, self.y / term)
+        return getter(self.headers, self.values / term)
     
     def __getitem__(self, key):
         if isinstance(key, str):
             key = self.headers.index(key)
-        return self.y[key]
+        return self.values[key]
     def __setitem__(self, key, value):
         if isinstance(key, str):
             key = self.headers.index(key)
-        self.y[key] = value
-    def values(self):
-        return self.y
-    def keys(self):
-        return self.headers
-    def mean(self, index=None):
-        if index is None:
-            return self.y.mean()
-        return self[index].mean()
+        self.values[key] = value
 
 class read:
     def __init__(self, path:str = 'data.csv', x:str='Elevation_m'):
         self.x = []
-        self.xname = x
+        self.xlabel = x
         self.y = []
         self.path = path
         with open(path, 'r') as file:
@@ -56,14 +48,22 @@ class read:
         if index is not None:
             self.y[index] -= self.y[index][0]
 
+    def mean(self, ft=None, index=None):
+        mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
+        if index is None:
+            return self.y.values.T[mask].T.mean()
+        return self.y[index][mask].mean()
+
 class plotter:
     def __init__(self, data:read, ft:tuple=None):
         self.data = copy(data)
+        self.xlabel = copy(self.data.xlabel)
+        self.ylabel = None
         self.dict = {}
         self.plots = []
         mask = slice(None) if ft is None else (ft[0] <= self.data.x) & (self.data.x <= ft[1])
         self.data.x = self.data.x[mask]
-        self.data.y = getter(self.data.headers, self.data.y.values().T[mask].T)
+        self.data.y = getter(self.data.headers, self.data.y.values.T[mask].T)
     
     def __update(self, index, target, n):
         if index not in self.dict.keys():
@@ -82,10 +82,8 @@ class plotter:
 
     def plot(self, index=None):
         if index is not None:
-            if isinstance(index, str):
-                label = index
-            else:
-                label = index = self.data.headers[index]
+            if not isinstance(index, str):
+                index = self.data.headers[index]
             self.__update(index, self.data.y[index], 0)
 
         else:
@@ -94,15 +92,13 @@ class plotter:
 
     def trend(self, index=None, name=False):
         if index is not None:
-            if isinstance(index, str):
-                label = index
-            else:
-                label = index = self.data.headers[index]
+            if not isinstance(index, str):
+                index = self.data.headers[index]
             
             k = self.__linreg(index)
             self.__update(index, k[0]*self.data.x + k[1], 1)
             if name:
-                self.__update(index, f'Trendline for {label}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
+                self.__update(index, f'Trendline for {index}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
         else:
             for i in self.data.headers:
@@ -120,46 +116,51 @@ class plotter:
         for k,v in self.dict.items():
             if not(v[0] is None and v[1] is not None):
                 ldict += 1
-                ylabel = k
+                yname = k
                 color = ax._get_lines.get_next_color()
                 if v[0] is not None:
                     ax.plot(self.data.x, v[0], label=k, color=color, marker=markrs, linestyle=lstyle)
                 if v[1] is not None:
                     ax.plot(self.data.x, v[1], label=v[2], color=color, linestyle=':', alpha=0.7)
 
-        ax.set_xlabel(self.data.xname)
         if grid:
             ax.grid(alpha=0.3)
-        fig.tight_layout()
-        if ldict == 1:
-            ax.set_ylabel(ylabel)
+        
+        ax.set_xlabel(self.xlabel)
+        if self.ylabel is None:
+            if ldict == 1:
+                ax.set_ylabel(yname)
+            else:
+                fig.legend()
         else:
-            fig.legend()
+            ax.set_ylabel(self.ylabel)
+        
+        fig.tight_layout()
         plt.show()
     
     def showbox(self, *, grid:bool=True):
         fig, ax = plt.subplots(label=self.data.path)
         label = []
         q = []
-        for p in self.dict.values():
-            if p[0] is not None:
-                label.append(p[2])
-                q.append(p[0])
+        for k, v in self.dict.items():
+            if v[0] is not None:
+                label.append(k)
+                q.append(v[0])
         ax.boxplot(q, showfliers=False)
         ax.set_xticklabels(label)
         if grid:
             ax.yaxis.grid(alpha=0.3)
         fig.tight_layout()
-        fig.legend()
+        ax.set_ylabel(self.ylabel)
         plt.show()
 
     def showdist(self, normal:bool=True, title:bool=False, *, grid:bool=True, res=100):
         q = []
         label = []
-        for p in self.dict.values():
+        for k, p in self.dict.items():
             if p[0] is not None:
                 q.append(p[0])
-                label.append(p[2])
+                label.append(k)
         lenq = len(q)
         w = int(sqrt(lenq))
         h = int((lenq/w)+.999999999)
@@ -177,8 +178,8 @@ class plotter:
                 for i in range(len(bl)-1):
                     if bl[i] != bl[i+1]:
                         count.append(y)
-            sigma = std(count)
-            mu = mean(count)
+            sigma = std(q[j])
+            mu = mean(q[j])
             factor = (q[j].max()-q[j].min())/res * len(count)
             color = ax[j]._get_lines.get_next_color()
             if normal:
@@ -188,8 +189,12 @@ class plotter:
             ax[j].hist(count, bins=res, color = color)
             if title:
                 ax[j].set_title(label[j])
-            ax[j].set_xlabel(label[j])
+            if self.ylabel is None:
+                ax[j].set_xlabel(label[j])
+            else:
+                ax[j].set_xlabel(self.ylabel)
             ax[j].set_ylabel('Occurrences')
+
         if grid:
             for k in ax:
                 k.grid(alpha=0.3)
