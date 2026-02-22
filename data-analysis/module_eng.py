@@ -74,10 +74,10 @@ class read:
             lei = 0
             p = set(a[concatenate((find_peaks(a)[0], find_peaks(-a)[0]))])
             for ex in p:
-                s = sign(a-ex)
+                s = a-ex
                 counts = 0
                 for q in range(len(s)-1):
-                    if s[q] != s[q+1]:
+                    if s[q] * s[q+1] <= 0:
                         counts += 1
                 
                 if counts == n:
