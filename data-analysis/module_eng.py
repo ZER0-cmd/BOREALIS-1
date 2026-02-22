@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from numpy import *
 import csv
 from copy import copy
-from scipy.signal import find_peaks, argrelmax, argrelmin
+from scipy.signal import find_peaks
 
 class getter:
     def __init__(self, headers, values):
@@ -72,9 +72,9 @@ class read:
             interval = []
             n = 0
             lei = 0
-            p = concatenate((argrelmin(a)[0], argrelmax(a)[0]))
-            for i in p:
-                s = sign(a-a[i])
+            p = set(a[concatenate((find_peaks(a)[0], find_peaks(-a)[0]))])
+            for ex in p:
+                s = sign(a-ex)
                 counts = 0
                 for q in range(len(s)-1):
                     if s[q] != s[q+1]:
@@ -82,10 +82,10 @@ class read:
                 
                 if counts == n:
                     lei += 1
-                    interval.append(a[i])
+                    interval.append(ex)
                 if counts > n:
                     n = counts
-                    interval = [a[i]]
+                    interval = [ex]
                     lei = 1
                 
             interval.sort(reverse=True)
