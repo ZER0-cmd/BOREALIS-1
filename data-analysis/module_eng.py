@@ -67,7 +67,7 @@ class plotter:
     
     def __update(self, index, target, n):
         if index not in self.dict.keys():
-            self.dict[index] = [None,None,None,None]
+            self.dict[index] = [None,None,None]
         self.dict[index][n] = target
     
     def __linreg(self, index):
@@ -87,12 +87,10 @@ class plotter:
             else:
                 label = index = self.data.headers[index]
             self.__update(index, self.data.y[index], 0)
-            self.__update(index, label, 2)
 
         else:
-            for i in range(len(self.data.y)):
+            for i in self.data.headers:
                 self.__update(i, self.data.y[i], 0)
-                self.__update(i, self.data.headers[i], 2)
 
     def trend(self, index=None, name=False):
         if index is not None:
@@ -104,33 +102,30 @@ class plotter:
             k = self.__linreg(index)
             self.__update(index, k[0]*self.data.x + k[1], 1)
             if name:
-                self.__update(index, f'Trendline for {label}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 3)
+                self.__update(index, f'Trendline for {label}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
         else:
             for i in self.data.headers:
                 k = self.__linreg(i)
                 self.__update(i, k[0]*self.data.x + k[1], 1)
                 if name:
-                    self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 3)
+                    self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
     def show(self, *, markers=True, lines=True, grid:bool=True):
-        dval = []
-        ldict = 0
-        for k, v in self.dict.items():
-            if not (v[0] is None and v[1] is not None):
-                ldict += 1
-                dval.append(v)
-                ylabel = k
-
         fig, ax = plt.subplots(label=self.data.path)
         lstyle = '-' if lines else ''
         markrs = 'x' if markers else ''
-        for p in dval:
-            color = ax._get_lines.get_next_color()
-            if p[0] is not None:
-                ax.plot(self.data.x, p[0], label=p[2], color=color, marker=markrs, linestyle=lstyle)
-            if p[1] is not None:
-                ax.plot(self.data.x, p[1], label=p[3], color=color, linestyle=':', alpha=0.7)
+        ldict = 0
+
+        for k,v in self.dict.items():
+            if not(v[0] is None and v[1] is not None):
+                ldict += 1
+                ylabel = k
+                color = ax._get_lines.get_next_color()
+                if v[0] is not None:
+                    ax.plot(self.data.x, v[0], label=k, color=color, marker=markrs, linestyle=lstyle)
+                if v[1] is not None:
+                    ax.plot(self.data.x, v[1], label=v[2], color=color, linestyle=':', alpha=0.7)
 
         ax.set_xlabel(self.data.xname)
         if grid:
