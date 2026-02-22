@@ -95,6 +95,7 @@ class read:
                     rei[int(i/2),0] = interval[i]
                 else:
                     rei[int((i-1)/2),1] = interval[i]
+            #rei is a 2darray which is a list of y-intervals where most lines intersect the same y-value
             re.append(rei)
         
         if le == 1:
