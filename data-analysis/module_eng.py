@@ -37,7 +37,9 @@ class getter:
 class read:
     def __init__(self, path:str = 'data.csv', x:str='Elevation_m'):
         self.x = []
+        self.xname = x
         self.y = []
+        self.path = path
         with open(path, 'r') as file:
             reader = csv.DictReader(file)
             self.headers = reader.fieldnames[1:]
@@ -55,14 +57,13 @@ class read:
             self.y[index] -= self.y[index][0]
 
 class plotter:
-    def __init__(self, data:read, ft:tuple=None, name:bool=None):
+    def __init__(self, data:read, ft:tuple=None):
         self.data = copy(data)
         self.dict = {}
         self.plots = []
-        self.name = name
         mask = slice(None) if ft is None else (ft[0] <= self.data.x) & (self.data.x <= ft[1])
         self.data.x = self.data.x[mask]
-        self.data.y = self.data.y.values().T[mask].T
+        self.data.y = getter(self.data.headers, self.data.y.values().T[mask].T)
     
     def __update(self, index, target, n):
         if index not in self.dict.keys():
@@ -83,9 +84,8 @@ class plotter:
         if index is not None:
             if isinstance(index, str):
                 label = index
-                index = self.data.headers.index(index)
             else:
-                label = self.data.headers[index]
+                label = index = self.data.headers[index]
             self.__update(index, self.data.y[index], 0)
             self.__update(index, label, 2)
 
@@ -98,9 +98,8 @@ class plotter:
         if index is not None:
             if isinstance(index, str):
                 label = index
-                index = self.data.headers.index(index)
             else:
-                label = self.data.headers[index]
+                label = index = self.data.headers[index]
             
             k = self.__linreg(index)
             self.__update(index, k[0]*self.data.x + k[1], 1)
@@ -108,33 +107,43 @@ class plotter:
                 self.__update(index, f'Trendline for {label}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 3)
 
         else:
-            for i in range(len(self.data.y)):
-                label = self.data.headers[i]
+            for i in self.data.headers:
                 k = self.__linreg(i)
                 self.__update(i, k[0]*self.data.x + k[1], 1)
                 if name:
-                    self.__update(i, f'Trendline for {label}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 3)
+                    self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 3)
 
-    def show(self, *, grid:bool=True):
-        fig, ax = plt.subplots(label=self.name)
-        for p in self.dict.values():
+    def show(self, *, markers=True, lines=True, grid:bool=True):
+        dval = []
+        ldict = 0
+        for k, v in self.dict.items():
+            if not (v[0] is None and v[1] is not None):
+                ldict += 1
+                dval.append(v)
+                ylabel = k
+
+        fig, ax = plt.subplots(label=self.data.path)
+        lstyle = '-' if lines else ''
+        markrs = 'x' if markers else ''
+        for p in dval:
             color = ax._get_lines.get_next_color()
-            if p[0] is None and p[1] is not None:
-                p[1] = None
             if p[0] is not None:
-                ax.plot(self.data.x, p[0], label=p[2], color=color)
+                ax.plot(self.data.x, p[0], label=p[2], color=color, marker=markrs, linestyle=lstyle)
             if p[1] is not None:
                 ax.plot(self.data.x, p[1], label=p[3], color=color, linestyle=':', alpha=0.7)
 
-        ax.set_xlabel('Tid')
+        ax.set_xlabel(self.data.xname)
         if grid:
             ax.grid(alpha=0.3)
         fig.tight_layout()
-        fig.legend()
+        if ldict == 1:
+            ax.set_ylabel(ylabel)
+        else:
+            fig.legend()
         plt.show()
     
     def showbox(self, *, grid:bool=True):
-        fig, ax = plt.subplots(label=self.name)
+        fig, ax = plt.subplots(label=self.data.path)
         label = []
         q = []
         for p in self.dict.values():
@@ -160,7 +169,7 @@ class plotter:
         w = int(sqrt(lenq))
         h = int((lenq/w)+.999999999)
 
-        fig, ax = plt.subplots(h, w, label=self.name)
+        fig, ax = plt.subplots(h, w, label=self.data.path)
         if lenq == 1:
             ax = [ax]
         ax = reshape(ax, -1)
