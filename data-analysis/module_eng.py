@@ -2,11 +2,17 @@ import matplotlib.pyplot as plt
 from numpy import *
 import csv
 from copy import copy
+from scipy.signal import find_peaks, argrelmax, argrelmin
 
 class getter:
     def __init__(self, headers, values):
         self.headers = headers
         self.values = values
+    def __str__(self):
+        s = ''
+        for i in range(len(self.headers)):
+            s += f'{self.headers[i]}: \n {self.values[i]}\t\n\n'
+        return "{\n\n" + s + "}"
 
     def __add__(self, term):
         return getter(self.headers, self.values + term)
@@ -25,6 +31,7 @@ class getter:
         if isinstance(key, str):
             key = self.headers.index(key)
         self.values[key] = value
+
 
 class read:
     def __init__(self, path:str = 'data.csv', x:str='Elevation_m'):
@@ -53,6 +60,47 @@ class read:
         if index is None:
             return self.y.values.T[mask].T.mean()
         return self.y[index][mask].mean()
+    
+    def typevalue(self, ft=None, index=None):
+        mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
+        y = self.y.values.T[mask].T if index is None else [self.y[index][mask]]
+        
+        re = []
+        le = 0
+        for a in y:
+            le += 1
+            interval = []
+            n = 0
+            lei = 0
+            p = concatenate((argrelmin(a)[0], argrelmax(a)[0]))
+            for i in p:
+                s = sign(a-a[i])
+                counts = 0
+                for q in range(len(s)-1):
+                    if s[q] != s[q+1]:
+                        counts += 1
+                
+                if counts == n:
+                    lei += 1
+                    interval.append(a[i])
+                if counts > n:
+                    n = counts
+                    interval = [a[i]]
+                    lei = 1
+                
+            interval.sort(reverse=True)
+            rei = zeros((int(lei/2),2))
+            for i in range(lei):
+                if i % 2 == 0:
+                    rei[int(i/2),0] = interval[i]
+                else:
+                    rei[int((i-1)/2),1] = interval[i]
+            re.append(rei)
+        
+        if le == 1:
+            return re[0]
+        return getter(self.headers, re)
+
 
 class plotter:
     def __init__(self, data:read, ft:tuple=None):
