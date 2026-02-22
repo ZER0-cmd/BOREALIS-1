@@ -89,7 +89,7 @@ class read:
                     lei = 1
                 
             interval.sort(reverse=True)
-            rei = zeros((int(lei/2),2))
+            rei = full((int(ceil(lei/2)),2), nan)
             for i in range(lei):
                 if i % 2 == 0:
                     rei[int(i/2),0] = interval[i]
