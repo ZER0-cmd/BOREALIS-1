@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from numpy import *
 import csv
+from copy import copy
 
 class getter:
     def __init__(self, headers, y):
@@ -54,13 +55,11 @@ class läs:
             self.y[index] -= self.y[index][0]
 
 class grafritare:
-    def __init__(self, data:läs, ft:tuple=None, *, namn:bool=None, x:bool=None):
-        self.data = data
+    def __init__(self, data:läs, ft:tuple=None, namn:bool=None):
+        self.data = copy(data)
         self.dict = {}
         self.plots = []
         self.name = namn
-        if x is not None:
-            self.data.x = x
         mask = slice(None) if ft is None else (ft[0] <= self.data.x) & (self.data.x <= ft[1])
         self.data.x = self.data.x[mask]
         self.data.y = self.data.y.värden().T[mask].T
@@ -120,6 +119,8 @@ class grafritare:
         fig, ax = plt.subplots(label=self.name)
         for p in self.dict.values():
             color = ax._get_lines.get_next_color()
+            if p[0] is None and p[1] is not None:
+                p[1] = None
             if p[0] is not None:
                 ax.plot(self.data.x, p[0], label=p[2], color=color)
             if p[1] is not None:
