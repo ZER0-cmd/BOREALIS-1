@@ -157,10 +157,10 @@ class grafritare:
                 if name:
                     self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
-    def visa(self, *, markers=True, lines=True, rutnät:bool=True):
+    def visa(self, *, markörer=True, linjer=True, rutnät:bool=True):
         fig, ax = plt.subplots(label=self.data.path)
-        lstyle = '-' if lines else ''
-        markrs = 'x' if markers else ''
+        lstyle = '-' if linjer else ''
+        markrs = 'x' if markörer else ''
         ldict = 0
 
         for k,v in self.dict.items():
