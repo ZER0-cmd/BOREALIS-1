@@ -105,7 +105,7 @@ class läs:
 
 
 class grafritare:
-    def __init__(self, data:read, ft:Sequence=None):
+    def __init__(self, data:läs, ft:Sequence=None):
         self.data = copy(data)
         self.xtitel = copy(self.data.xlabel)
         self.ytitel = None
