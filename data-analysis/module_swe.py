@@ -140,22 +140,22 @@ class grafritare:
             for i in self.data.rubriker:
                 self.__update(i, self.data.y[i], 0)
 
-    def trend(self, index=None, name=False):
+    def trend(self, index=None, namn=False):
         if index is not None:
             if not isinstance(index, str):
                 index = self.data.rubriker[index]
             
             k = self.__linreg(index)
             self.__update(index, k[0]*self.data.x + k[1], 1)
-            if name:
-                self.__update(index, f'Trendline for {index}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
+            if namn:
+                self.__update(index, f'Trendlinje för {index}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
         else:
             for i in self.data.rubriker:
                 k = self.__linreg(i)
                 self.__update(i, k[0]*self.data.x + k[1], 1)
-                if name:
-                    self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
+                if namn:
+                    self.__update(i, f'Trendlinje för {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
     def visa(self, *, markörer=True, linjer=True, rutnät:bool=True):
         fig, ax = plt.subplots(label=self.data.path)
