@@ -3,6 +3,7 @@ from numpy import *
 import csv
 from copy import copy
 from scipy.signal import find_peaks
+from collections.abc import Sequence
 
 class getter:
     def __init__(self, headers, values):
@@ -33,7 +34,7 @@ class getter:
         self.värden[key] = value
 
 
-class read:
+class läs:
     def __init__(self, path:str = 'data.csv', x:str='Elevation_m'):
         self.x = []
         self.xlabel = x
@@ -51,17 +52,17 @@ class read:
         self.x = array(self.x)
         self.y = getter(self.rubriker, array(self.y).T)
 
-    def zero(self, index=None):
+    def nollställ(self, index=None):
         if index is not None:
             self.y[index] -= self.y[index][0]
 
-    def mean(self, ft=None, index=None):
+    def medelvärde(self, ft:Sequence=None, index=None):
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
         if index is None:
             return self.y.värden.T[mask].T.mean()
         return self.y[index][mask].mean()
     
-    def typevalue(self, ft=None, index=None):
+    def typevärde(self, ft:Sequence=None, index=None):
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
         y = self.y.värden.T[mask].T if index is None else [self.y[index][mask]]
         
@@ -103,8 +104,8 @@ class read:
         return getter(self.rubriker, re)
 
 
-class plotter:
-    def __init__(self, data:read, ft:tuple=None):
+class grafritare:
+    def __init__(self, data:read, ft:Sequence=None):
         self.data = copy(data)
         self.xtitel = copy(self.data.xlabel)
         self.ytitel = None
@@ -129,7 +130,7 @@ class plotter:
         r2 = 1 - ssres/sstot if sstot != 0 else 1.
         return [k[0], k[1], r2]
 
-    def plot(self, index=None):
+    def rita(self, index=None):
         if index is not None:
             if not isinstance(index, str):
                 index = self.data.rubriker[index]
@@ -156,7 +157,7 @@ class plotter:
                 if name:
                     self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
-    def show(self, *, markers=True, lines=True, grid:bool=True):
+    def visa(self, *, markers=True, lines=True, rutnät:bool=True):
         fig, ax = plt.subplots(label=self.data.path)
         lstyle = '-' if lines else ''
         markrs = 'x' if markers else ''
@@ -172,7 +173,7 @@ class plotter:
                 if v[1] is not None:
                     ax.plot(self.data.x, v[1], label=v[2], color=color, linestyle=':', alpha=0.7)
 
-        if grid:
+        if rutnät:
             ax.grid(alpha=0.3)
         
         ax.set_xlabel(self.xtitel)
@@ -187,7 +188,7 @@ class plotter:
         fig.tight_layout()
         plt.show()
     
-    def showbox(self, *, grid:bool=True):
+    def visalådagram(self, *, rutnät:bool=True):
         fig, ax = plt.subplots(label=self.data.path)
         label = []
         q = []
@@ -197,13 +198,13 @@ class plotter:
                 q.append(v[0])
         ax.boxplot(q, showfliers=False)
         ax.set_xticklabels(label)
-        if grid:
-            ax.yaxis.grid(alpha=0.3)
+        if rutnät:
+            ax.yaxis.rutnät(alpha=0.3)
         fig.tight_layout()
         ax.set_ylabel(self.ytitel)
         plt.show()
 
-    def showdist(self, normal:bool=True, title:bool=False, *, grid:bool=True, res=100):
+    def visafördelning(self, normal:bool=True, title:bool=False, *, rutnät:bool=True, res=100):
         q = []
         label = []
         for k, p in self.dict.items():
@@ -244,7 +245,7 @@ class plotter:
                 ax[j].set_xlabel(self.ytitel)
             ax[j].set_ylabel('Occurrences')
 
-        if grid:
+        if rutnät:
             for k in ax:
                 k.grid(alpha=0.3)
         fig.tight_layout()
