@@ -199,7 +199,7 @@ class grafritare:
         ax.boxplot(q, showfliers=False)
         ax.set_xticklabels(label)
         if rutnät:
-            ax.yaxis.rutnät(alpha=0.3)
+            ax.yaxis.grid(alpha=0.3)
         fig.tight_layout()
         ax.set_ylabel(self.ytitel)
         plt.show()
