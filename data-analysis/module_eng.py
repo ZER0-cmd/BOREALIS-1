@@ -34,7 +34,7 @@ class getter:
 
 
 class read:
-    def __init__(self, path:str = 'data.csv', x:str='Elevation_m'):
+    def __init__(self, path:str = 'data.csv', x:str='alt'):
         self.x = []
         self.xlabel = x
         self.y = []
