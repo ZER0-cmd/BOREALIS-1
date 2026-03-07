@@ -35,7 +35,7 @@ class getter:
 
 
 class läs:
-    def __init__(self, path:str = 'data.csv', x:str='Elevation_m'):
+    def __init__(self, path:str = 'data.csv', x:str='alt'): #helt lost? 
         self.x = []
         self.xlabel = x
         self.y = []
