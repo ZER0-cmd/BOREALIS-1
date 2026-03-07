@@ -236,7 +236,7 @@ class grafritare:
             factor = (q[j].max()-q[j].min())/res * len(count)
             color = ax[j]._get_lines.get_next_color()
             if normal:
-                ax[j].plot(yrange, factor/(sigma * sqrt(2*pi)) * e**(- (yrange - mu)**2 / (2*sigma**2)), color=color, label=f'Normal Distribution:\n$\sigma = {sigma:.4f}$\n$\mu = {mu:.4f}$')
+                ax[j].plot(yrange, factor/(sigma * sqrt(2*pi)) * e**(- (yrange - mu)**2 / (2*sigma**2)), color=color, label=f'Normal Distribution:\n$\\sigma = {sigma:.4f}$\n$\\mu = {mu:.4f}$')
                 ax[j].legend()
             color = ax[j]._get_lines.get_next_color()
             ax[j].hist(count, bins=res, color = color)
