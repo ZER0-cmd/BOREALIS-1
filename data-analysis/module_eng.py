@@ -36,12 +36,16 @@ class getter:
 class read:
     def __init__(self, path:str = 'data.csv', x:str='alt'):
         self.x = []
-        self.xlabel = x
         self.y = []
         self.path = path
         with open(path, 'r') as file:
             reader = csv.DictReader(file)
-            self.headers = reader.fieldnames[1:]
+            self.headers = reader.fieldnames.copy()
+            if x is None:
+                x = self.headers.pop(0)
+            else:
+                self.headers.remove(x)
+            self.xlabel = x
             for row in reader:
                 data = []
                 self.x.append(float(row[x]))
