@@ -162,7 +162,7 @@ class grafritare:
                 if namn:
                     self.__update(i, f'Trendlinje för {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
-    def visa(self, *, markörer=True, linjer=True, rutnät:bool=True):
+    def visa(self, *, markörer=True, linjer=True, invertera:bool=True, rutnät:bool=True):
         fig, ax = plt.subplots(label=self.data.path)
         lstyle = '-' if linjer else ''
         markrs = 'x' if markörer else ''
@@ -173,10 +173,16 @@ class grafritare:
                 ldict += 1
                 yname = k
                 color = ax._get_lines.get_next_color()
-                if v[0] is not None:
-                    ax.plot(self.data.x, v[0], label=k, color=color, marker=markrs, linestyle=lstyle)
-                if v[1] is not None:
-                    ax.plot(self.data.x, v[1], label=v[2], color=color, linestyle=':', alpha=0.7)
+                if invertera:
+                    if v[0] is not None:
+                        ax.plot(v[0], self.data.x, label=k, color=color, marker=markrs, linestyle=lstyle)
+                    if v[1] is not None:
+                        ax.plot(v[1], self.data.x, label=v[2], color=color, linestyle=':', alpha=0.7)
+                else:
+                    if v[0] is not None:
+                        ax.plot(self.data.x, v[0], label=k, color=color, marker=markrs, linestyle=lstyle)
+                    if v[1] is not None:
+                        ax.plot(self.data.x, v[1], label=v[2], color=color, linestyle=':', alpha=0.7)
 
         if rutnät:
             ax.grid(alpha=0.3)
