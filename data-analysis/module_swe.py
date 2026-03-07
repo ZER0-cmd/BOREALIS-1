@@ -46,8 +46,8 @@ class läs:
                 x = self.rubriker.pop(0)
             else:
                 self.rubriker.remove(x)
+            print(self.rubriker)
             self.xlabel = x
-            print(x)
             for row in reader:
                 data = []
                 self.x.append(float(row[x]))
