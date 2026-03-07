@@ -42,9 +42,11 @@ class läs:
         with open(path, 'r') as file:
             reader = csv.DictReader(file)
             if x is None:
-                x=reader.fieldnames[0]
-            self.xlabel = x
-            self.rubriker = reader.fieldnames[1:]    
+                x = reader.fieldnames[0]
+                self.rubriker = reader.fieldnames[1:]
+            else:
+                self.rubriker = reader.fieldnames[index(x)]
+            self.xlabel = x    
             for row in reader:
                 data = []
                 self.x.append(float(row[x]))
