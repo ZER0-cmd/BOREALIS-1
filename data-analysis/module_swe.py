@@ -50,7 +50,6 @@ class läs:
             for row in reader:
                 data = []
                 self.x.append(float(row[x]))
-                
                 for header in self.rubriker:
                     data.append(float(row[header]))
                 self.y.append(data)
