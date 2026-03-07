@@ -35,17 +35,16 @@ class getter:
 
 
 class läs:
-    def __init__(self, path:str = 'data.csv', x:str= None): #helt lost? 
+    def __init__(self, path:str = 'data.csv', x:str= None): #helt lost?
+        self.x = []
+        self.y = []
+        self.path = path
          with open(path, 'r') as file:
             reader = csv.DictReader(file)
             if x is None:
                 x=reader.fieldnames[0]
-            self.rubriker = reader.fieldnames[1:]
-        self.x = []
-        self.xlabel = x
-        self.y = []
-        self.path = path
-       
+            self.xlabel = x
+            self.rubriker = reader.fieldnames[1:]    
             for row in reader:
                 data = []
                 self.x.append(float(row[x]))
