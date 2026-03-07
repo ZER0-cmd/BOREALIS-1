@@ -39,7 +39,7 @@ class läs:
         self.x = []
         self.y = []
         self.path = path
-         with open(path, 'r') as file:
+        with open(path, 'r') as file:
             reader = csv.DictReader(file)
             if x is None:
                 x=reader.fieldnames[0]
