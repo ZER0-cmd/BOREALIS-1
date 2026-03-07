@@ -160,7 +160,7 @@ class plotter:
                 if name:
                     self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
-    def show(self, *, markers=True, lines=True, grid:bool=True):
+    def show(self, *, markers=True, lines=True, invert:bool=True, grid:bool=True):
         fig, ax = plt.subplots(label=self.data.path)
         lstyle = '-' if lines else ''
         markrs = 'x' if markers else ''
@@ -171,22 +171,38 @@ class plotter:
                 ldict += 1
                 yname = k
                 color = ax._get_lines.get_next_color()
-                if v[0] is not None:
-                    ax.plot(self.data.x, v[0], label=k, color=color, marker=markrs, linestyle=lstyle)
-                if v[1] is not None:
-                    ax.plot(self.data.x, v[1], label=v[2], color=color, linestyle=':', alpha=0.7)
+                if invert:
+                    if v[0] is not None:
+                        ax.plot(v[0], self.data.x, label=k, color=color, marker=markrs, linestyle=lstyle)
+                    if v[1] is not None:
+                        ax.plot(v[1], self.data.x, label=v[2], color=color, linestyle=':', alpha=0.7)
+                else:
+                    if v[0] is not None:
+                        ax.plot(self.data.x, v[0], label=k, color=color, marker=markrs, linestyle=lstyle)
+                    if v[1] is not None:
+                        ax.plot(self.data.x, v[1], label=v[2], color=color, linestyle=':', alpha=0.7)
 
         if grid:
             ax.grid(alpha=0.3)
-        
-        ax.set_xlabel(self.xlabel)
-        if self.ylabel is None:
-            if ldict == 1:
-                ax.set_ylabel(yname)
+
+        if invert:
+            ax.set_ylabel(self.xlabel)
+            if self.xlabel is None:
+                if ldict == 1:
+                    ax.set_xlabel(yname)
+                else:
+                    fig.legend()
             else:
-                fig.legend()
+                ax.set_xlabel(self.ylabel)
         else:
-            ax.set_ylabel(self.ylabel)
+            ax.set_xlabel(self.xlabel)
+            if self.ylabel is None:
+                if ldict == 1:
+                    ax.set_ylabel(yname)
+                else:
+                    fig.legend()
+            else:
+                ax.set_ylabel(self.ylabel)
         
         fig.tight_layout()
         plt.show()
