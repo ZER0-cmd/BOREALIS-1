@@ -186,15 +186,25 @@ class grafritare:
 
         if rutnät:
             ax.grid(alpha=0.3)
-        
-        ax.set_xlabel(self.xtitel)
-        if self.ytitel is None:
-            if ldict == 1:
-                ax.set_ylabel(yname)
+
+        if invertera:
+            ax.set_ylabel(self.xtitel)
+            if self.xtitel is None:
+                if ldict == 1:
+                    ax.set_xlabel(yname)
+                else:
+                    fig.legend()
             else:
-                fig.legend()
+                ax.set_xlabel(self.ytitel)
         else:
-            ax.set_ylabel(self.ytitel)
+            ax.set_xlabel(self.xtitel)
+            if self.ytitel is None:
+                if ldict == 1:
+                    ax.set_ylabel(yname)
+                else:
+                    fig.legend()
+            else:
+                ax.set_ylabel(self.ytitel)
         
         fig.tight_layout()
         plt.show()
