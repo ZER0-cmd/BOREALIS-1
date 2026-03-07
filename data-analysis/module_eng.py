@@ -3,6 +3,7 @@ from numpy import *
 import csv
 from copy import copy
 from scipy.signal import find_peaks
+from collections.abc import Sequence
 
 class getter:
     def __init__(self, headers, values):
@@ -108,7 +109,7 @@ class read:
 
 
 class plotter:
-    def __init__(self, data:read, ft:tuple=None):
+    def __init__(self, data:read, ft:Sequence=None):
         self.data = copy(data)
         self.xlabel = copy(self.data.xlabel)
         self.ylabel = None
