@@ -41,11 +41,11 @@ class läs:
         self.path = path
         with open(path, 'r') as file:
             reader = csv.DictReader(file)
+            self.rubriker = reader.fieldnames
             if x is None:
-                x = reader.fieldnames[0]
-                self.rubriker = reader.fieldnames[1:]
+                x = self.rubriker.pop(0)
             else:
-                self.rubriker = reader.fieldnames[index(x)]
+                self.rubriker.remove(x)
             self.xlabel = x    
             for row in reader:
                 data = []
