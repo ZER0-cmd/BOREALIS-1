@@ -6,6 +6,10 @@ from scipy.signal import find_peaks
 from collections.abc import Sequence
 
 class getter:
+    '''
+    RÖR INTE SOM DELTAGARE / DO NOT TOUCH AS A PARTICIPANT
+    1darray dictionary edition for getting with both values and keys
+    '''
     def __init__(self, headers, values):
         self.rubriker = headers
         self.värden = values
@@ -35,6 +39,22 @@ class getter:
 
 
 class läs:
+    '''
+    Läser och lagrar data från en csv-fil. Första raden i csv-filen måste vara rubrikerna. För använding med grafritare.
+
+    Rådatan extrraheras med .x och .y. y-värdena kan indexeras med .y[header] om det finns flera kolumner.
+
+    (Endast läsning)
+    Rubrikerna lagras i .rubriker
+    Filvägen lagras i .path
+
+    Konfigurationsargument:
+        path (str): Sökvägen till csv-filen. Default är 'data.csv'.
+        x (str): Rubriken för x-värdena.
+
+    Exempel:
+        data = läs('data.csv')
+    '''
     def __init__(self, path:str = 'data.csv', x:str= None): #helt lost?
         self.x = []
         self.y = []
@@ -57,16 +77,48 @@ class läs:
         self.y = getter(self.rubriker, array(self.y).T)
 
     def nollställ(self, index=None):
+        '''
+        Nollsäller y-värdena så att det första y-värdet blir 0.
+
+        Konfigurationsargument:
+            index (str or int): Vilken y-kolumn som ska nollsättas. Default är None, vilket nollsätter alla kolumner.
+        '''
         if index is not None:
             self.y[index] -= self.y[index][0]
 
     def medelvärde(self, ft:Sequence=None, index=None):
+        '''
+        Beräknar medelvärdet av y-värdena i ett visst intervall av x-värden.
+
+        Konfigurationsargument:
+            ft (arraylike): Intervall för x-värden.
+            index (str or int): Vilken y-kolumn som ska användas. Default är None, vilket använder alla kolumner.
+        
+        Returnerar:
+            float: Medelvärdet av y-värdena i det angivna intervallet.
+
+        Exempel:
+            data.medelvärde(ft=(0, 20), index='Temperature_K')
+        '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
         if index is None:
             return self.y.värden.T[mask].T.mean()
         return self.y[index][mask].mean()
     
     def typevärde(self, ft:Sequence=None, index=None):
+        '''
+        Beräknar typevärdet av y-värdena i ett visst intervall av x-värden.
+
+        Konfigurationsargument:
+            ft (arraylike): Intervall för x-värden.
+            index (str or int): Vilken y-kolumn som ska användas. Default är None, vilket använder alla kolumner.
+
+        Returnerar:
+            getter: En lista av intervall där flest linjer skär samma y-värde flest gånger.
+
+        Exempel:
+            data.typevärde(ft=(0, 20), index='Temperature_K')
+        '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
         y = self.y.värden.T[mask].T if index is None else [self.y[index][mask]]
         
@@ -110,6 +162,21 @@ class läs:
 
 class grafritare:
     def __init__(self, data:läs, ft:Sequence=None):
+        '''
+        Skapar en grafritare med data från en läs (data) objekt. Förbereder datan för att ritas.
+
+        x och y-axelns titlar kan ändras genom att modifiera .xtitel och .ytitel.
+        
+        Argument:
+            data (läs): Datan som ska ritas.
+            ft (arraylike): Intervall för x-värden.
+        
+        Konfigurationsargument:
+            ft (arraylike): Intervall för x-värden.
+
+        Exempel:
+            graf = grafritare(data, ft=(0, 20))
+        '''
         self.data = copy(data)
         self.xtitel = copy(self.data.xlabel)
         self.ytitel = None
@@ -135,6 +202,15 @@ class grafritare:
         return [k[0], k[1], r2]
 
     def rita(self, index=None):
+        '''
+        Ritar data och förbereder det för .visa()
+
+        Konfigurationsargument:
+            index (str or int): Vilken y-kolumn som ska ritas. Default är None, vilket ritar alla kolumner.
+        
+        Exempel:
+            graf.rita(index='Temperature_K')
+        '''
         if index is not None:
             if not isinstance(index, str):
                 index = self.data.rubriker[index]
@@ -145,6 +221,13 @@ class grafritare:
                 self.__update(i, self.data.y[i], 0)
 
     def trend(self, index=None, namn=False):
+        '''
+        Beräknar och förbereder en trendlinje för .visa()
+        
+        Konfigurationsargument:
+            index (str or int): Vilken y-kolumn som ska användas för trendlinjen. Default är None, vilket använder alla kolumner.
+            namn (bool): Om True, lägger till en etikett med lutning, intercept och R^2-värde i legendan. Default är False.
+        '''
         if index is not None:
             if not isinstance(index, str):
                 index = self.data.rubriker[index]

@@ -43,17 +43,15 @@ class read:
         '''
         Reads and stores data from a csv file. For usage with plotter
 
-        The raw data is extrancted with .x and .y. The y-values can be indexed with .y[header] if there are multiple columns.
+        The raw data is extracted with .x and .y. The y-values can be indexed with .y[header] if there are multiple columns.
         
         (Read Only)
         The headers are stored in .headers
         The path is stored in .path
-
-        Arguments:
-            path (str): The path to the csv file.
         
         Optional arguments:
-            x (str): The header for the x-values.
+            path (str): The path to the csv file. Default is 'data.csv'.
+            x (str): The header for the x-values. Default is 'Elevation_m'.
         
         Example:
             data = read('data.csv')
@@ -83,7 +81,7 @@ class read:
         Zeroes the y-values so that the first y-values is zero.
 
         Optional arguments:
-            index (str or int): The header or index of the y-values to zero. If None, all y-values are zeroed.
+            index (str or int): The header or index of the y-values to zero. Default is None, which zeros all y-values.
         '''
         if index is not None:
             self.y[index] -= self.y[index][0]
@@ -165,7 +163,7 @@ class read:
 class plotter:
     def __init__(self, data:read, ft:Sequence=None):
         '''
-        Plots the data from a read (data) object.
+        Prepares the data from a read (data) object for plotting.
 
         The x and y labels can be changed by modifying .xlabel and .ylabel.
 
@@ -226,7 +224,7 @@ class plotter:
         '''
         Plots the trendline for the data and prepares it for .show()
 
-        Arguments:
+        Optional arguments:
             index (str or int): The header name or index of the data to plot the trendline for. If None, trendlines for all data are plotted.
             name (bool): Whether to include the slope, intercept and R^2 value in the legend. Default is False.
         '''
@@ -326,7 +324,7 @@ class plotter:
 
     def showdist(self, normal:bool=True, title:bool=False, *, grid:bool=True, res=100):
         '''
-        Shows how many times the data intersect certain values.
+        Shows how many times the data intersect certain values, which can give an indication of the distribution of the data.
 
         Optional arguments:
             normal (bool): Whether to show the normal distribution curve. Default is True.
