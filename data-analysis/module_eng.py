@@ -6,6 +6,10 @@ from scipy.signal import find_peaks
 from collections.abc import Sequence
 
 class getter:
+    '''
+    RÖR INTE SOM DELTAGARE / DO NOT TOUCH AS A PARTICIPANT
+    1darray dictionary edition for getting with both values and keys
+    '''
     def __init__(self, headers, values):
         self.headers = headers
         self.values = values
@@ -35,7 +39,25 @@ class getter:
 
 
 class read:
-    def __init__(self, path:str = 'data.csv', x:str='alt'):
+    def __init__(self, path:str = 'data.csv', x:str='Elevation_m'):
+        '''
+        Reads and stores data from a csv file. For usage with plotter
+
+        The raw data is extrancted with .x and .y. The y-values can be indexed with .y[header] if there are multiple columns.
+        
+        (Read Only)
+        The headers are stored in .headers
+        The path is stored in .path
+
+        Arguments:
+            path (str): The path to the csv file.
+        
+        Optional arguments:
+            x (str): The header for the x-values.
+        
+        Example:
+            data = read('data.csv')
+        '''
         self.x = []
         self.y = []
         self.path = path
@@ -57,16 +79,48 @@ class read:
         self.y = getter(self.headers, array(self.y).T)
 
     def zero(self, index=None):
+        '''
+        Zeroes the y-values so that the first y-values is zero.
+
+        Optional arguments:
+            index (str or int): The header or index of the y-values to zero. If None, all y-values are zeroed.
+        '''
         if index is not None:
             self.y[index] -= self.y[index][0]
 
-    def mean(self, ft=None, index=None):
+    def mean(self, ft:Sequence=None, index=None):
+        '''
+        Returns the mean of the y-values in the given x-interval.
+        
+        Optional arguments:
+            ft (arraylike): The x-interval to calculate the mean in
+            index: The header or index of the y-values to calculate the mean for. If None, the mean of all y-values is calculated.
+        
+        Returns:
+            float: The mean of the y-values in the given x-interval.
+        
+        Example:
+            data.mean(ft=(0, 20), index='Temperature_K')
+        '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
         if index is None:
             return self.y.values.T[mask].T.mean()
         return self.y[index][mask].mean()
     
     def typevalue(self, ft=None, index=None):
+        '''
+        Returns the typevalue of the y-values in the given x-interval.
+
+        Optional arguments:
+            ft (arraylike): The x-interval to calculate the typevalue in.
+            index: The header or index of the y-values to calculate the typevalue for. If None, the typevalue of all y-values is calculated (potentially slow O(N³)).
+        
+        Returns:
+            getter: A list of intervals of where the most lines intersect the same y-value the maximum ammount of times.
+
+        Example:
+            data.typevalue(ft=(0, 20), index='Temperature_K')
+        '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
         y = self.y.values.T[mask].T if index is None else [self.y[index][mask]]
         
@@ -110,6 +164,20 @@ class read:
 
 class plotter:
     def __init__(self, data:read, ft:Sequence=None):
+        '''
+        Plots the data from a read (data) object.
+
+        The x and y labels can be changed by modifying .xlabel and .ylabel.
+
+        Arguments:
+            data (read): The data to plot.
+        
+        Optional arguments:
+            ft (arraylike): The x-interval to plot in.
+
+        Example:
+            graph = plotter(data, ft=(0, 20))
+        '''
         self.data = copy(data)
         self.xlabel = copy(self.data.xlabel)
         self.ylabel = None
@@ -135,6 +203,16 @@ class plotter:
         return [k[0], k[1], r2]
 
     def plot(self, index=None):
+        '''
+        Plots the data and prepares it for .show()
+
+        Optional arguments:
+            index (str or int): The header name or index of the data to plot.
+        
+        Example:
+            graph.plot('Temperature_K')
+    
+        '''
         if index is not None:
             if not isinstance(index, str):
                 index = self.data.headers[index]
@@ -145,6 +223,13 @@ class plotter:
                 self.__update(i, self.data.y[i], 0)
 
     def trend(self, index=None, name=False):
+        '''
+        Plots the trendline for the data and prepares it for .show()
+
+        Arguments:
+            index (str or int): The header name or index of the data to plot the trendline for. If None, trendlines for all data are plotted.
+            name (bool): Whether to include the slope, intercept and R^2 value in the legend. Default is False.
+        '''
         if index is not None:
             if not isinstance(index, str):
                 index = self.data.headers[index]
@@ -162,6 +247,15 @@ class plotter:
                     self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
     def show(self, *, markers=True, lines=True, invert:bool=True, grid:bool=True):
+        '''
+        Shows the plot.
+
+        Optional keyword arguments:
+            markers (bool): Whether to mark the datapoints in the plot. Default is True.
+            lines (bool): Whether to connect the datapoints with lines. Default is True.
+            invert (bool): Whether to invert the x and y axes (usually so altitude becomes y-axis). Default is True.
+            grid (bool): Whether to show a grid in the plot. Default is True.
+        '''
         fig, ax = plt.subplots(label=self.data.path)
         lstyle = '-' if lines else ''
         markrs = 'x' if markers else ''
@@ -209,6 +303,12 @@ class plotter:
         plt.show()
     
     def showbox(self, *, grid:bool=True):
+        '''
+        Shows a box plot of the data.
+
+        Optional arguments:
+            grid (bool): Whether to show a grid in the plot. Default is True.
+        '''
         fig, ax = plt.subplots(label=self.data.path)
         label = []
         q = []
@@ -225,6 +325,16 @@ class plotter:
         plt.show()
 
     def showdist(self, normal:bool=True, title:bool=False, *, grid:bool=True, res=100):
+        '''
+        Shows how many times the data intersect certain values.
+
+        Optional arguments:
+            normal (bool): Whether to show the normal distribution curve. Default is True.
+            title (bool): Whether to show the header name as the title of each subplot. Default is False.
+        Optional keyword arguments:
+            grid (bool): Whether to show a grid in the plot. Default is True.
+            res (int): The resolution of the histogram. Default is 100.
+        '''
         q = []
         label = []
         for k, p in self.dict.items():
