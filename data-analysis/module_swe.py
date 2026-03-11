@@ -245,6 +245,15 @@ class grafritare:
                     self.__update(i, f'Trendlinje för {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
     def visa(self, *, markörer=True, linjer=True, invertera:bool=True, rutnät:bool=True):
+        '''
+        Visar grafen.
+
+        Konfigurationsargument (nyckelord):
+            markörer (bool): Om True, ritar markörer på datapunkterna. Default är True.
+            linjer (bool): Om True, ritar linjer mellan datapunkterna. Default är True.
+            invertera (bool): Om True, inverterar x- och y-axlarna. Default är True.
+            rutnät (bool): Om True, ritar ett rutnät. Default är True.
+        '''
         fig, ax = plt.subplots(label=self.data.path)
         lstyle = '-' if linjer else ''
         markrs = 'x' if markörer else ''
@@ -292,6 +301,12 @@ class grafritare:
         plt.show()
     
     def visalådagram(self, *, rutnät:bool=True):
+        '''
+        Visar ett lådagram för datan.
+
+        Konfigurationsargument:
+            rutnät (bool): Om True, ritar ett rutnät. Default är True.
+        '''
         fig, ax = plt.subplots(label=self.data.path)
         label = []
         q = []
@@ -308,6 +323,15 @@ class grafritare:
         plt.show()
 
     def visafördelning(self, normal:bool=True, title:bool=False, *, rutnät:bool=True, res=100):
+        '''
+        Visar hur många gånger datan korsar olika y-värden, vilket kan ge en indikation på datans fördelning.
+
+        Konfigurationsargument:
+            normal (bool): Om True, ritar en normalfördelningskurva baserat. Default är True.
+            title (bool): Om True, sätter titlar på varje subplot. Default är False.
+            rutnät (bool): Om True, ritar ett rutnät. Default är True.
+            res (int): Antal y-värden att räkna korsningar för. Default är 100.
+        '''
         q = []
         label = []
         for k, p in self.dict.items():
