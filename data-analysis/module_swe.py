@@ -161,22 +161,22 @@ class läs:
 
 
 class grafritare:
+    '''
+    Skapar en grafritare med data från en läs (data) objekt. Förbereder datan för att ritas.
+
+    x och y-axelns titlar kan ändras genom att modifiera .xtitel och .ytitel.
+    
+    Argument:
+        data (läs): Datan som ska ritas.
+        ft (arraylike): Intervall för x-värden.
+    
+    Konfigurationsargument:
+        ft (arraylike): Intervall för x-värden.
+
+    Exempel:
+        graf = grafritare(data, ft=(0, 20))
+    '''
     def __init__(self, data:läs, ft:Sequence=None):
-        '''
-        Skapar en grafritare med data från en läs (data) objekt. Förbereder datan för att ritas.
-
-        x och y-axelns titlar kan ändras genom att modifiera .xtitel och .ytitel.
-        
-        Argument:
-            data (läs): Datan som ska ritas.
-            ft (arraylike): Intervall för x-värden.
-        
-        Konfigurationsargument:
-            ft (arraylike): Intervall för x-värden.
-
-        Exempel:
-            graf = grafritare(data, ft=(0, 20))
-        '''
         self.data = copy(data)
         self.xtitel = copy(self.data.xlabel)
         self.ytitel = None
