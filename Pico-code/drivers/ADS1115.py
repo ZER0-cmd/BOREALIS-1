@@ -1,215 +1,353 @@
-# Import of Librarys
-from machine import I2C, Pin
-import utime
+#!/usr/bin/python
+import struct
+from time import sleep_ms
+__ADS1115_CONV_REG      = 0x00     #Conversion Register
+__ADS1115_CONFIG_REG    = 0x01     #Configuration Register
+__ADS1115_LO_THRESH_REG = 0x02     #Low Threshold Register
+__ADS1115_HI_THRESH_REG = 0x03     #High Threshold Register
 
-# Register variables
-_REGISTER_MASK = 0x03
-_REGISTER_CONVERT = 0x00
-_REGISTER_CONFIG = 0x01
-_REGISTER_LOWTHRESH = 0x02
-_REGISTER_HITHRESH = 0x03
+__ADS1115_DEFAULT_ADDR  = 0x48
+__ADS1115_REG_RESET_VAL = 0x8583
+__ADS1115_REG_FACTOR    = 0x7FFF
 
-_OS_MASK = 0x8000
-_OS_SINGLE = 0x8000     # Write: Set to start a single - conversion
-_OS_BUSY = 0x0000       # Read: Bit = 0 when conversion is in progress
-_OS_NOTBUSY = 0x8000    # Read: Bit = 1 when no conversion is in progress
+__ADS1115_BUSY          = 0x0000
+__ADS1115_START_ISREADY = 0x8000
 
-# Channel variables
-_MUX_MASK = 0x7000
-_MUX_DIFF_0_1 = 0x0000  # Differential P = AIN0, N = AIN1 (default)
-_MUX_DIFF_0_3 = 0x1000  # Differential P = AIN0, N = AIN3
-_MUX_DIFF_1_3 = 0x2000  # Differential P = AIN1, N = AIN3
-_MUX_DIFF_2_3 = 0x3000  # Differential P = AIN2, N = AIN3
-_MUX_SINGLE_0 = 0x4000  # Single - ended AIN0
-_MUX_SINGLE_1 = 0x5000  # Single - ended AIN1
-_MUX_SINGLE_2 = 0x6000  # Single - ended AIN2
-_MUX_SINGLE_3 = 0x7000  # Single - ended AIN3
+__ADS1115_COMP_INC = 0x1000
 
-# Gain variables
-_PGA_MASK = 0x0E00
-_PGA_6_144V = 0x0000    # + /-6.144V range  =  Gain 2/3
-_PGA_4_096V = 0x0200    # + /-4.096V range  =  Gain 1
-_PGA_2_048V = 0x0400    # + /-2.048V range  =  Gain 2 (default)
-_PGA_1_024V = 0x0600    # + /-1.024V range  =  Gain 4
-_PGA_0_512V = 0x0800    # + /-0.512V range  =  Gain 8
-_PGA_0_256V = 0x0A00    # + /-0.256V range  =  Gain 16
-
-# Mode variables
-_MODE_MASK = 0x0100
-_MODE_CONTIN = 0x0000   # Continuous conversion mode
-_MODE_SINGLE = 0x0100   # Power - down single - shot mode (default)
-
-# Samplerate variables
-_DR_MASK = 0x00E0       # ADS1115
-_DR_128SPS = 0x0000     # 8 samples per second
-_DR_250SPS = 0x0020     # 16 samples per second
-_DR_490SPS = 0x0040     # 32 samples per second
-_DR_920SPS = 0x0060     # 64 samples per second
-_DR_1600SPS = 0x0080    # 128 samples per second (default)
-_DR_2400SPS = 0x00A0    # 250 samples per second
-_DR_3300SPS = 0x00C0    # 475 samples per second
-_DR_860SPS = 0x00E0     # 860 samples per Second
-
-_CMODE_MASK = 0x0010
-_CMODE_TRAD = 0x0000    # Traditional comparator with hysteresis (default)
-_CMODE_WINDOW = 0x0010  # Window comparator
-
-_CPOL_MASK = 0x0008
-_CPOL_ACTVLOW = 0x0000  # ALERT / RDY pin is low when active (default)
-_CPOL_ACTVHI = 0x0008   # ALERT / RDY pin is high when active
-
-_CLAT_MASK = 0x0004     # Determines if ALERT / RDY pin latches once asserted
-_CLAT_NONLAT = 0x0000   # Non - latching comparator (default)
-_CLAT_LATCH = 0x0004    # Latching comparator
-
-_CQUE_MASK = 0x0003
-_CQUE_1CONV = 0x0000    # Assert ALERT / RDY after one conversions
-_CQUE_2CONV = 0x0001    # Assert ALERT / RDY after two conversions
-_CQUE_4CONV = 0x0002    # Assert ALERT / RDY after four conversions
-_CQUE_NONE = 0x0003     # Disable the comparator and put ALERT / RDY in high state (default)
-
-# List of all usable gains
-_GAINS = [
-        _PGA_6_144V,    # 2 / 3x
-        _PGA_4_096V,    # 1x
-        _PGA_2_048V,    # 2x (default)
-        _PGA_1_024V,    # 4x
-        _PGA_0_512V,    # 8x
-        _PGA_0_256V     # 16x
-]
-
-# List of voltage values corresponding to the list of usable gains
-_GAINS_V = [
-        6.144,          # 2 / 3x
-        4.096,          # 1x
-        2.048,          # 2x (default)
-        1.024,          # 4x
-        0.512,          # 8x
-        0.256           # 16x
-]
-
-# List of the different usable channels
-_CHANNELS = [           # CH1|CH2
-        _MUX_SINGLE_0,  # (0, None) (default)
-        _MUX_SINGLE_1,  # (1, None)
-        _MUX_SINGLE_2,  # (2, None)
-        _MUX_SINGLE_3,  # (3, None)
-        _MUX_DIFF_0_1,  # (0, 1)
-        _MUX_DIFF_0_3,  # (0, 3)
-        _MUX_DIFF_1_3,  # (1, 3)
-        _MUX_DIFF_2_3,  # (2, 3)
-]
-
-# List of all usable sample rates
-_RATES = [
-        _DR_128SPS,     # 8 samples per second
-        _DR_250SPS,     # 16 samples per second
-        _DR_490SPS,     # 32 samples per second
-        _DR_920SPS,     # 64 samples per second
-        _DR_1600SPS,    # 128 samples per second (default)
-        _DR_2400SPS,    # 250 samples per second
-        _DR_3300SPS,    # 475 samples per second
-        _DR_860SPS      # 860 samples per Second
-]
-
-i2c = I2C(0, sda = Pin(0), scl = Pin(1), freq = 100000)
-utime.sleep_ms(10)
-
-# All global variables used in the library, as well as some predefined variables that serve as default values.
-adsaddress = 0x48
-adsgain = _GAINS[2]
-adsrate = _RATES[4]
-adsmode = _MODE_CONTIN
-adsgainv = 2
-temp2 = bytearray(2)
-
-# Initialization of the ADS based on user input.
-def init(adr, gain, rate, mode):
-    global adsaddress
-    adsaddress = adr
-    setGain(gain)
-    setRate(rate)
-    setMode(mode)
-
-# Change the gains based on the user input.
-def setGain(gain):
-    global adsgain
-    global adsgainv
-    adsgain = _GAINS[gain]
-    adsgainv = gain
-
-# Change the sampling rate based on user input.
-def setRate(rate):
-    global adsrate
-    adsrate = _RATES[rate]
-
-# Change the mode based on user input.
-def setMode(mode = True):
-    global adsmode
-    if (mode):
-        adsmode = _MODE_SINGLE
-    else:
-        adsmode = _MODE_CONTIN
-
-# Write the desired 16-bit value into the register.
-def _write_register(reg, val):
-    temp2[0] = val >> 8
-    temp2[1] = val & 0xff
-    i2c.writeto_mem(adsaddress, reg, temp2)
-
-# Read the 16-bit register value to be returned.
-def _read_register(reg):
-    i2c.readfrom_mem_into(adsaddress, reg, temp2)
-    return (temp2[0] << 8) | temp2[1]
-
-# Reads any raw value (raw) either from the previously specified channel or from another variable and converts it to voltages.
-def raw_to_v(raw):
-    v_p_b = _GAINS_V[adsgainv] / 32767
-    return round(raw * v_p_b, 2)
+ADS1115_ASSERT_AFTER_1 = 0x0000
+ADS1115_ASSERT_AFTER_2 = 0x0001
+ADS1115_ASSERT_AFTER_4 = 0x0002
+ADS1115_DISABLE_ALERT  = 0x0003
+ADS1015_ASSERT_AFTER_1 = ADS1115_ASSERT_AFTER_1
+ADS1015_ASSERT_AFTER_2 = ADS1115_ASSERT_AFTER_2 
+ADS1015_ASSERT_AFTER_4 = ADS1115_ASSERT_AFTER_4
+ADS1015_DISABLE_ALERT  = ADS1115_DISABLE_ALERT
 
 
-# Reads the specified channel of the ADS1115.
-def read(chan):
-    # Linking of all required data by the bitwise operator 'OR ('|')'.
-    config = 0x0000
-    config |= _CHANNELS[chan]
-    config |= adsgain
-    config |= adsrate
-    config |= adsmode
-    config |= _CQUE_NONE
-    # Send the required data to the specified register.
-    _write_register(_REGISTER_CONFIG, config)
-    while not _read_register(_REGISTER_CONFIG) & _OS_NOTBUSY:
-        break
-    # Reading the returned data.
-    res = _read_register(_REGISTER_CONVERT)
-    if (res < 32768):
-        return res
-    else:
-        res = res - 65469
-        return res
+ADS1115_LATCH_DISABLED = 0x0000
+ADS1115_LATCH_ENABLED  = 0x0004
+ADS1015_LATCH_DISABLED = 0x0000
+ADS1015_LATCH_ENABLED  = 0x0004
+
+ADS1115_ACT_LOW  = 0x0000
+ADS1115_ACT_HIGH = 0x0008
+ADS1015_ACT_LOW  = ADS1115_ACT_LOW
+ADS1015_ACT_HIGH = ADS1115_ACT_HIGH
+
+ADS1115_MAX_LIMIT = 0x0000
+ADS1115_WINDOW    = 0x0010
+ADS1015_MAX_LIMIT = ADS1115_MAX_LIMIT
+ADS1015_WINDOW    = ADS1115_WINDOW
+
+ADS1115_8_SPS   = 0x0000
+ADS1115_16_SPS  = 0x0020
+ADS1115_32_SPS  = 0x0040
+ADS1115_64_SPS  = 0x0060
+ADS1115_128_SPS = 0x0080
+ADS1115_250_SPS = 0x00A0
+ADS1115_475_SPS = 0x00C0
+ADS1115_860_SPS = 0x00E0
+ADS1015_128_SPS  = ADS1115_8_SPS
+ADS1015_250_SPS  = ADS1115_16_SPS
+ADS1015_490_SPS  = ADS1115_32_SPS
+ADS1015_920_SPS  = ADS1115_64_SPS
+ADS1015_1600_SPS = ADS1115_128_SPS
+ADS1015_2400_SPS = ADS1115_250_SPS
+ADS1015_3300_SPS = ADS1115_475_SPS
+ADS1015_3300_SPS_2 = ADS1115_860_SPS
+
+ADS1115_RANGE_6144  = 0x0000
+ADS1115_RANGE_4096  = 0x0200
+ADS1115_RANGE_2048  = 0x0400
+ADS1115_RANGE_1024  = 0x0600
+ADS1115_RANGE_0512  = 0x0800
+ADS1115_RANGE_0256  = 0x0A00
+ADS1015_RANGE_6144  = ADS1115_RANGE_6144
+ADS1015_RANGE_4096  = ADS1115_RANGE_4096
+ADS1015_RANGE_2048  = ADS1115_RANGE_2048
+ADS1015_RANGE_1024  = ADS1115_RANGE_1024
+ADS1015_RANGE_0512  = ADS1115_RANGE_0512
+ADS1015_RANGE_0256  = ADS1115_RANGE_0256
+
+ADS1115_COMP_0_1   = 0x0000
+ADS1115_COMP_0_3   = 0x1000
+ADS1115_COMP_1_3   = 0x2000
+ADS1115_COMP_2_3   = 0x3000
+ADS1115_COMP_0_GND = 0x4000
+ADS1115_COMP_1_GND = 0x5000
+ADS1115_COMP_2_GND = 0x6000
+ADS1115_COMP_3_GND = 0x7000
+ADS1015_COMP_0_1   = ADS1115_COMP_0_1
+ADS1015_COMP_0_3   = ADS1115_COMP_0_3
+ADS1015_COMP_1_3   = ADS1115_COMP_1_3
+ADS1015_COMP_2_3   = ADS1115_COMP_2_3
+ADS1015_COMP_0_GND = ADS1115_COMP_0_GND
+ADS1015_COMP_1_GND = ADS1115_COMP_1_GND
+ADS1015_COMP_2_GND = ADS1115_COMP_2_GND
+ADS1015_COMP_3_GND = ADS1115_COMP_3_GND
+
+ADS1115_CONTINUOUS = 0x0000 
+ADS1115_SINGLE     = 0x0100
+ADS1015_CONTINUOUS = ADS1115_CONTINUOUS
+ADS1015_SINGLE     = ADS1115_SINGLE
+
+class ADS1115(object):
+    __autoRangeMode = False
+    __voltageRange = 2048
+    __measureMode = ADS1115_SINGLE
     
-# Reading multiple ADS1115 channels at once
-def readMulti(start, end):
-    res1 = 0
-    res2 = 0
-    res3 = 0
-    res4 = 0
-    if (start > 4): start = 4
-    if (start < 0): start = 0
-    if (end > 4): end = 4
-    if (end < 0): end = 0
-    for x in range (start, end):
-        if (x == 0):
-            res1 = read(x)
-            utime.sleep_ms(25)
-        if (x == 1):
-            res2 = read(x)
-            utime.sleep_ms(25)
-        if (x == 2):
-            res3 = read(x)
-            utime.sleep_ms(25)
-        if (x == 3):
-            res4 = read(x)
-            utime.sleep_ms(25)
-    return res1, res2, res3, res4
+    def __init__(self, address = __ADS1115_DEFAULT_ADDR, i2c = None):
+        self.__address = address
+        if i2c is None:
+            try:
+                i2c = I2C(0)
+            except:
+                i2c = I2C()
+        self.__i2c = i2c
+        try:
+            self.reset()
+        except OSError:  # I2C bus error:
+            raise ValueError("Can't connect to the ADS1115. Check wiring, address, etc.")
+        
+        self.setVoltageRange_mV(ADS1115_RANGE_2048)
+        self.__writeADS1115(__ADS1115_LO_THRESH_REG, 0x8000)
+        self.__writeADS1115(__ADS1115_HI_THRESH_REG, 0x7FFF)
+        self.__measureMode = ADS1115_SINGLE
+        self.__autoRangeMode = False
+        
+    def setAlertPinMode(self, mode):
+        currentConfReg = self.__getConfReg()
+        currentConfReg &= ~(0x8003)    
+        currentConfReg |= mode
+        self.__setConfReg(currentConfReg)
+
+    def setAlertLatch(self, latch):
+        currentConfReg = self.__getConfReg()
+        currentConfReg &= ~(0x8004)    
+        currentConfReg |= latch
+        self.__setConfReg(currentConfReg)
+        
+    def setAlertPol(self, polarity):
+        currentConfReg = self.__getConfReg()
+        currentConfReg &= ~(0x8008)    
+        currentConfReg |= polarity
+        self.__setConfReg(currentConfReg)
+
+    def setAlertModeAndLimit_V(self, mode, hiThres, loThres):
+        currentConfReg = self.__getConfReg()
+        currentConfReg &= ~(0x8010)    
+        currentConfReg |= mode
+        self.__setConfReg(currentConfReg)
+        alertLimit = self.__calcLimit(hiThres)
+        self.__writeADS1115(__ADS1115_HI_THRESH_REG, alertLimit)
+        alertLimit = self.__calcLimit(loThres)
+        self.__writeADS1115(__ADS1115_LO_THRESH_REG, alertLimit)
+        
+    def __calcLimit(self, rawLimit):
+        limit = int((rawLimit * __ADS1115_REG_FACTOR / self.__voltageRange) * 1000)
+        if limit > 32767:                       
+            limit -= 65536
+        return limit
+        
+    def reset(self):
+        return self.__setConfReg(__ADS1115_REG_RESET_VAL)
+        
+    def setVoltageRange_mV(self, newRange):
+        currentVoltageRange = self.__voltageRange
+        currentConfReg = self.__getConfReg()
+        currentRange = (currentConfReg >> 9) & 7
+        currentAlertPinMode = currentConfReg & 3
+        
+        self.setMeasureMode(ADS1115_SINGLE)
+       
+        if newRange == ADS1115_RANGE_6144:
+            self.__voltageRange = 6144;
+        elif newRange == ADS1115_RANGE_4096:
+             self.__voltageRange = 4096;
+        elif newRange == ADS1115_RANGE_2048:
+            self.__voltageRange = 2048;
+        elif newRange == ADS1115_RANGE_1024:
+            self.__voltageRange = 1024;
+        elif newRange == ADS1115_RANGE_0512:
+            self.__voltageRange = 512;
+        elif newRange == ADS1115_RANGE_0256:
+            self.__voltageRange = 256;
+ 
+        if (currentRange != newRange) and (currentAlertPinMode != ADS1115_DISABLE_ALERT):
+            alertLimit = self.__readADS1115(__ADS1115_HI_THRESH_REG)
+            alertLimit = alertLimit * (currentVoltageRange / self.__voltageRange)
+            self.__writeADS1115(__ADS1115_HI_THRESH_REG, alertLimit)
+            alertLimit = self.__readADS1115(__ADS1115_LO_THRESH_REG)
+            alertLimit = alertLimit * (currentVoltageRange / self.__voltageRange)
+            self.__writeADS1115(__ADS1115_LO_THRESH_REG, alertLimit)   
+     
+        currentConfReg &= ~(0x8E00)    
+        currentConfReg |= newRange
+        self.__setConfReg(currentConfReg)
+        rate = self.__getConvRate()
+        self.__delayAccToRate(rate)
+        
+    def setAutoRange(self):
+        currentConfReg = self.__getConfReg()
+        self.setVoltageRange_mV(ADS1115_RANGE_6144)
+        
+        if self.__measureMode == ADS1115_SINGLE:
+            self.setMeasureMode(ADS1115_CONTINUOUS)
+            convRate = self.__getConvRate()
+            self.__delayAccToRate(convRate) 
+        
+        rawResult = abs(self.__getConvReg())        
+        optRange = ADS1115_RANGE_6144
+        
+        if rawResult < 1093:
+            optRange = ADS1115_RANGE_0256
+        elif rawResult < 2185:
+            optRange = ADS1115_RANGE_0512
+        elif rawResult < 4370:
+            optRange = ADS1115_RANGE_1024
+        elif rawResult < 8738:
+            optRange = ADS1115_RANGE_2048
+        elif rawResult < 17476:
+            optRange = ADS1115_RANGE_4096
+            
+        self.__setConfReg(currentConfReg)
+        self.setVoltageRange_mV(optRange)
+        
+    def setPermanentAutoRangeMode(self, autoMode):
+        if autoMode:
+            self.__autoRangeMode = True
+        else:
+            self.__autoRangeMode = False
+                   
+    def setMeasureMode(self, mMode):
+        currentConfReg = self.__getConfReg()
+        self.__measureMode = mMode
+        currentConfReg &= ~(0x8100)    
+        currentConfReg |= mMode
+        self.__setConfReg(currentConfReg)
+        
+    def setCompareChannels(self, compChannels):
+        currentConfReg = self.__getConfReg()
+        currentConfReg &= ~(0xF000)    
+        currentConfReg |= compChannels
+        self.__setConfReg(currentConfReg)
+        
+        if not (currentConfReg & 0x0100):  # if not single shot mode
+            convRate = self.__getConvRate()
+            for i in range(2):
+                self.__delayAccToRate(convRate)
+            
+    def setSingleChannel(self, channel):
+        if channel >= 4:
+            return
+        self.setCompareChannels((ADS1115_COMP_0_GND + ADS1115_COMP_INC) * channel)
+        
+    def isBusy(self):
+        currentConfReg = self.__getConfReg()
+        return not((currentConfReg>>15) & 1)
+    
+    def startSingleMeasurement(self):
+        currentConfReg = self.__getConfReg()
+        currentConfReg |= (1 << 15)
+        self.__setConfReg(currentConfReg)
+        
+    def getResult_V(self):
+        return self.getResult_mV()/1000
+
+    def getResult_mV(self):
+        rawResult = self.getRawResult()
+        return rawResult * self.__voltageRange / __ADS1115_REG_FACTOR
+
+    def getRawResult(self):
+        rawResult = self.__getConvReg()
+                
+        if self.__autoRangeMode:
+            if (abs(rawResult) > 26214) and (self.__voltageRange != 6144): # 80%
+                self.setAutoRange()
+                rawResult = self.__getConvReg()
+            elif (abs(rawResult) < 9800) and (self.__voltageRange != 256):  # 30%
+                self.setAutoRange()
+                rawResult = self.__getConvReg()
+                
+        return rawResult
+    
+    def __getConvReg(self):
+        rawResult = self.__readADS1115(__ADS1115_CONV_REG)
+        if rawResult > 32767:
+            rawResult -= 65536
+        return rawResult
+    
+    def getResultWithRange(self, minLimit, maxLimit):
+        rawResult = self.getRawResult()
+        result = rawResult * (maxLimit - minLimit) / 65536
+        return result
+
+    def getResultWithRangeAndMaxVolt(self, minLimit, maxLimit, maxMillivolt):
+        result = self.getResultWithRange(minLimit, maxLimit)
+        result = result * self.__voltageRange / maxMillivolt
+        return result
+
+    def getVoltageRange_mV(self):
+        return self.__voltageRange
+
+    def setAlertPinToConversionReady(self):
+        self.__writeADS1115(__ADS1115_LO_THRESH_REG, (0<<15))
+        self.__writeADS1115(__ADS1115_HI_THRESH_REG, (1<<15))
+
+    def clearAlert(self):
+        self.__readADS1115(__ADS1115_CONV_REG)    
+    
+    def __setConfReg(self, regVal):
+        self.__writeADS1115(__ADS1115_CONFIG_REG, regVal)
+    
+    def __getConfReg(self):
+        return self.__readADS1115(__ADS1115_CONFIG_REG)
+        
+    def __getConvRate(self):
+        currentConfReg = self.__getConfReg()
+        return (currentConfReg & 0xE0)
+    
+    def setConvRate(self, rate):
+        currentConfReg = self.__getConfReg()
+        currentConfReg &= ~(0x80E0)
+        currentConfReg |= rate
+        self.__setConfReg(currentConfReg)
+    
+    def __delayAccToRate(self, rate):
+        if rate == ADS1115_8_SPS:
+            sleep_ms(130)
+        elif rate == ADS1115_16_SPS:
+            sleep_ms(65)
+        elif rate == ADS1115_32_SPS:
+            sleep_ms(32)
+        elif rate == ADS1115_64_SPS:
+            sleep_ms(16)
+        elif rate == ADS1115_128_SPS:
+            sleep_ms(8)
+        elif rate == ADS1115_250_SPS:
+            sleep_ms(4)
+        elif rate == ADS1115_475_SPS:
+            sleep_ms(3)
+        elif rate == ADS1115_860_SPS:
+            sleep_ms(2)
+    
+    def __writeADS1115(self, reg, val):
+        self.__i2c.writeto_mem(self.__address, reg, self.__toBytearray(val))
+        
+    def __readADS1115(self, reg):
+        regVal = self.__i2c.readfrom_mem(self.__address, reg, 2)
+        return self.__bytesToInt(regVal)
+    
+    def __toBytearray(self, intVal):
+#        return bytearray(intVal.to_bytes(2, 'big'))
+        return struct.pack('>i',intVal)[2:]
+    
+    def __bytesToInt(self, bytesToConvert):
+        intVal = int.from_bytes(bytesToConvert, 'big') # "big" = MSB at beginning
+        return intVal
+
+class ADS1015(ADS1115):
+     def __init__(self, address = __ADS1115_DEFAULT_ADDR, i2c = None):
+        super().__init__(address, i2c)
+   

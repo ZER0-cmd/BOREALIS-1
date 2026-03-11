@@ -9,7 +9,6 @@ from drivers.rtc_ds3231 import DS3231
 from drivers.storage_sdcard import SDCard
 from drivers.input_button import Button
 from drivers.output_led import LED
-
 from app.timekeeping import Timekeeper
 from app.logging import SdLogger
 from app.ui import Ui

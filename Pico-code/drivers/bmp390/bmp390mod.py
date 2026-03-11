@@ -5,8 +5,8 @@ import micropython
 import array
 
 from collections import namedtuple
-from sensor_pack_2 import bus_service
-from sensor_pack_2.base_sensor import IBaseSensorEx, Iterator, IDentifier, DeviceEx, check_value
+import bus_service
+import IBaseSensorEx, Iterator, IDentifier, DeviceEx, check_value
 
 # ВНИМАНИЕ: не подключайте питание датчика к 5В, иначе датчик выйдет из строя! Только 3.3В!!!
 # WARNING: do not connect "+" to 5V or the sensor will be damaged!
