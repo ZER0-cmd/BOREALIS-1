@@ -4,24 +4,23 @@
 OLED_WIDTH = 128
 OLED_HEIGHT = 64
 OLED_I2C_ADDR = 0x3C
+OLED_SPLASH_MS = 3000
 
-# I2C bus (OLED + SHT31 + DS3231)
+# I2C bus (OLED + RTC + future sensors if needed)
+# GP0 = SDA, GP1 = SCL  (Pico physical pins 1 and 2)
 I2C_ID = 0
 I2C_SDA = 0
 I2C_SCL = 1
 I2C_FREQ = 400_000
 
-# SHT31
-SHT31_ADDR = 0x44
-
-# DS3231
+# RTC
 DS3231_ADDR = 0x68
 
 # Button / switch
 BUTTON_PIN = 15
-BUTTON_PULL = "down"          # "down" or "up"
-BUTTON_ACTIVE_LEVEL = 1       # 0 if switch pulls pin low when ON; 1 if pulls high when ON
-BUTTON_DEBOUNCE_MS = 50       # keep small, you already have a stable switch
+BUTTON_PULL = "down"
+BUTTON_ACTIVE_LEVEL = 1
+BUTTON_DEBOUNCE_MS = 50
 
 # LEDs
 RED_LED_PIN = 17
@@ -38,4 +37,4 @@ SD_BAUDRATE = 1_000_000
 SD_MOUNT_POINT = "/sd"
 
 # Sampling / UI update
-SAMPLE_INTERVAL_MS = 1000      # sensor read & log interval while ON
+SAMPLE_INTERVAL_MS = 1000
