@@ -1,4 +1,4 @@
-import time
+import time #morbing time 
 from machine import Pin, I2C
 
 import config
