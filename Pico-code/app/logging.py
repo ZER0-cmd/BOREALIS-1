@@ -11,6 +11,7 @@ class SdLogger:
         self._mounted = False
         self._file = None
         self._path = None
+        self._headers = None
 
     def mount(self, sdcard_block_device) -> bool:
         """
@@ -47,11 +48,22 @@ class SdLogger:
         self._file = open(path, "a")
         self._path = path
         return path
+    
+    def write_headers(self, headers):
+        self._headers = headers
+        for s in headers:
+            self._file.write(s + ',')
+        self._file.write('\n')
+        self._file.flush()
 
-    def write_row(self, utc_iso: str, temp_c: float, rh_percent: float) -> None:
+    def write_row(self, data:tuple) -> None:
         if not self._file:
             return
-        self._file.write("%s,%.2f,%.2f\n" % (utc_iso, temp_c, rh_percent))
+        if self._headers is None:
+            self.write_headers(data)
+        if len(data) != len(self.headers):
+            return
+        self._file.write("%s,%.2f,%.2f\n" % data)
         self._file.flush()
 
     def stop(self) -> None:
