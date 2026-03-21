@@ -14,10 +14,9 @@ blink(1)
 
 try:
     from app.controller import App
-    blink(2)
     App().run()
 except Exception as e:
-    # FATAL boot failure
+    # FATAL boot failure:
+    # stay here so the error can be inspected in REPL
     while True:
-        blink(5, on=0.05, off=0.05)
-        time.sleep(1)
+        pass

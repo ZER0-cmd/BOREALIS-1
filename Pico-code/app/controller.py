@@ -4,6 +4,7 @@ from machine import Pin, I2C
 import config
 from drivers.display_ssd1306 import SSD1306_I2C
 from drivers.output_led import LED
+from drivers.sd_detect import SdDetect
 from app.ui import Ui
 
 
@@ -19,7 +20,6 @@ class App:
             freq=config.I2C_FREQ,
         )
 
-        # Make sure OLED is present
         addrs = self.i2c.scan()
         if config.OLED_I2C_ADDR not in addrs:
             raise OSError(
@@ -36,16 +36,28 @@ class App:
 
         self.ui = Ui(self.oled)
 
+        # microSD detect input
+        self.sd_detect = SdDetect(
+            config.SD_DETECT_PIN,
+            active_low=config.SD_DETECT_ACTIVE_LOW
+        )
+
     def run(self):
-        # Turn green LED on during boot
         self.green_led.on()
 
-        # Splash screen: logo + title
+        # Splash screen
         self.ui.show_boot("pictures/logo.csv")
         time.sleep_ms(config.OLED_SPLASH_MS)
 
-        # Then idle screen
-        self.ui.show_idle()
-
+        # Live detect test screen
         while True:
+            inserted = self.sd_detect.is_inserted()
+
+            self.oled.fill(0)
+            self.oled.text("Borealis", 0, 0)
+            self.oled.text("microSD detect:", 0, 16)
+            self.oled.text("INSERTED" if inserted else "NOT INSERTED", 0, 30)
+            self.oled.text("RAW: %d" % self.sd_detect.raw(), 0, 46)
+            self.oled.show()
+
             time.sleep_ms(200)

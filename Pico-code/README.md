@@ -6,11 +6,7 @@ How to setup pico:
 
 How to setup vscode:
 
-to check what code is on pico currently::
-
-
-
-How to upload code to pico:
+to check what code is on pico currently:
 
 mpremote fs ls :
 
@@ -20,7 +16,7 @@ mpremote fs cp -r . :
 
 Enter this command to reset and run pico:
 
-mpremote connect COMx reset
+mpremote reset
 
 To delete all files in pico filesystem:
 

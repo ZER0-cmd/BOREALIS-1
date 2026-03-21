@@ -16,6 +16,10 @@ I2C_FREQ = 400_000
 # RTC
 DS3231_ADDR = 0x68
 
+# microSD detect
+SD_DETECT_PIN = 19
+SD_DETECT_ACTIVE_LOW = True
+
 # Button / switch
 BUTTON_PIN = 15
 BUTTON_PULL = "down"
