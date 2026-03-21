@@ -22,4 +22,8 @@ Enter this command to reset and run pico:
 
 mpremote connect COMx reset
 
+To delete all files in pico filesystem:
+
+mpremote fs rm -r :
+
 make sure mpremote is installed first!

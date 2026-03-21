@@ -1,4 +1,4 @@
-import time #morbing time 
+import time
 from machine import Pin, I2C
 
 import config
@@ -19,13 +19,13 @@ class App:
             freq=config.I2C_FREQ,
         )
 
-        # Optional: check that OLED is actually present
+        # Make sure OLED is present
         addrs = self.i2c.scan()
         if config.OLED_I2C_ADDR not in addrs:
-            raise OSError("OLED not found at address 0x%02X. Found: %s" % (
-                config.OLED_I2C_ADDR,
-                [hex(a) for a in addrs]
-            ))
+            raise OSError(
+                "OLED not found at address 0x%02X. Found: %s"
+                % (config.OLED_I2C_ADDR, [hex(a) for a in addrs])
+            )
 
         self.oled = SSD1306_I2C(
             config.OLED_WIDTH,
@@ -33,15 +33,18 @@ class App:
             self.i2c,
             addr=config.OLED_I2C_ADDR,
         )
+
         self.ui = Ui(self.oled)
 
     def run(self):
-        # Boot splash
-        self.ui.show_boot()
+        # Turn green LED on during boot
         self.green_led.on()
+
+        # Splash screen: logo + title
+        self.ui.show_boot("pictures/logo.csv")
         time.sleep_ms(config.OLED_SPLASH_MS)
 
-        # Idle screen
+        # Then idle screen
         self.ui.show_idle()
 
         while True:
