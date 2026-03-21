@@ -10,8 +10,11 @@ from app.ui import Ui
 
 class App:
     def __init__(self):
-        self.red_led = LED(config.RED_LED_PIN, active_high=config.LED_ACTIVE_HIGH)
-        self.green_led = LED(config.GREEN_LED_PIN, active_high=config.LED_ACTIVE_HIGH)
+        # One status LED only
+        self.status_led = LED(
+            config.STATUS_LED_PIN,
+            active_high=config.LED_ACTIVE_HIGH
+        )
 
         self.i2c = I2C(
             config.I2C_ID,
@@ -36,28 +39,84 @@ class App:
 
         self.ui = Ui(self.oled)
 
-        # microSD detect input
         self.sd_detect = SdDetect(
             config.SD_DETECT_PIN,
             active_low=config.SD_DETECT_ACTIVE_LOW
         )
 
+    def _run_startup_checks(self):
+        """
+        Run startup checks while the splash screen is visible.
+
+        Current check:
+        - microSD detect
+
+        Returns:
+            True if all checks pass
+            False otherwise
+        """
+        start_ms = time.ticks_ms()
+        splash_ms = config.OLED_SPLASH_MS
+
+        led_state = False
+        last_toggle_ms = start_ms
+        blink_interval_ms = 100  # fast blink during startup check
+
+        sd_ok = False
+
+        while time.ticks_diff(time.ticks_ms(), start_ms) < splash_ms:
+            now = time.ticks_ms()
+
+            # Current system check
+            sd_ok = self.sd_detect.is_inserted()
+
+            # Fast LED blink during checking
+            if time.ticks_diff(now, last_toggle_ms) >= blink_interval_ms:
+                last_toggle_ms = now
+                led_state = not led_state
+                if led_state:
+                    self.status_led.on()
+                else:
+                    self.status_led.off()
+
+            time.sleep_ms(10)
+
+        return sd_ok
+
+    def _show_check_result(self, ok):
+        """
+        Final LED behavior after startup check:
+        - if OK: one success flash, then stay ON
+        - if FAIL: stay OFF
+        """
+        if ok:
+            # stop blink cleanly
+            self.status_led.off()
+            time.sleep_ms(80)
+
+            # success flash
+            self.status_led.on()
+            time.sleep_ms(200)
+            self.status_led.off()
+            time.sleep_ms(120)
+
+            # steady ON
+            self.status_led.on()
+        else:
+            self.status_led.off()
+
     def run(self):
-        self.green_led.on()
-
-        # Splash screen
+        # Show splash screen first
         self.ui.show_boot("pictures/logo.csv")
-        time.sleep_ms(config.OLED_SPLASH_MS)
 
-        # Live detect test screen
+        # Run checks during splash screen time
+        system_ok = self._run_startup_checks()
+
+        # Show final LED result
+        self._show_check_result(system_ok)
+
+        # Go to idle screen
+        self.ui.show_idle()
+
         while True:
-            inserted = self.sd_detect.is_inserted()
-
-            self.oled.fill(0)
-            self.oled.text("Borealis", 0, 0)
-            self.oled.text("microSD detect:", 0, 16)
-            self.oled.text("INSERTED" if inserted else "NOT INSERTED", 0, 30)
-            self.oled.text("RAW: %d" % self.sd_detect.raw(), 0, 46)
-            self.oled.show()
-
             time.sleep_ms(200)
