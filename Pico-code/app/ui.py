@@ -9,69 +9,20 @@ class Ui:
         seconds = total_seconds % 60
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
 
-    def _draw_csv_logo_scaled(self, path, x_offset=0, y_offset=0, scale_div=2, threshold=0.5):
-        """
-        Reads logo CSV lines in the format:
-        x,y,brightness
-
-        Example:
-        0,0,0.0
-        0,1,0.87
-        0,2,1.0
-
-        brightness is treated as grayscale float from 0.0 to 1.0.
-        We threshold it to monochrome for the OLED.
-
-        scale_div=2 means:
-        64x64 source -> 32x32 display
-        """
+    def _draw_image(self, path, x_offset=0, y_offset=0):
         with open(path, "r") as file:
-            for line in file:
-                line = line.strip()
-                if not line:
+            for p in file:
+                p = p.strip().split(',')
+                if len(p) != 3:
                     continue
-
-                parts = line.split(",")
-                if len(parts) != 3:
-                    continue
-
-                try:
-                    src_x = int(parts[0])
-                    src_y = int(parts[1])
-                    brightness = float(parts[2])
-                except ValueError:
-                    continue
-
-                # Downscale by skipping pixels
-                if src_x % scale_div != 0 or src_y % scale_div != 0:
-                    continue
-
-                x = (src_x // scale_div) + x_offset
-                y = (src_y // scale_div) + y_offset
-
-                # Convert grayscale -> OLED mono pixel
-                color = 1 if brightness >= threshold else 0
-
-                if 0 <= x < 128 and 0 <= y < 64:
-                    self.oled.pixel(x, y, color)
+                self.oled.pixel(int(p[0]) + x_offset,
+                                int(p[1]) + y_offset,
+                                int(p[2]))
+                
 
     def show_boot(self, logo_path="pictures/logo.csv"):
         self.oled.fill(0)
-
-        try:
-            # 64x64 logo scaled down to 32x32
-            # centered horizontally: (128 - 32) // 2 = 48
-            self._draw_csv_logo_scaled(
-                logo_path,
-                x_offset=48,
-                y_offset=4,
-                scale_div=2,
-                threshold=0.5
-            )
-        except Exception:
-            pass
-
-        self.oled.text("Borealis", 24, 44)
+        self._draw_image(logo_path)
         self.oled.show()
 
     def show_idle(self):
