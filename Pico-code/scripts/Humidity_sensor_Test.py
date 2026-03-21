@@ -1,13 +1,17 @@
-from machine import Pin, I2C
 import time
-from sensor_sht31 import SHT31
+from machine import Pin, I2C
 
-# I2C1 on Raspberry Pi Pico
-# SDA = GPIO14 (physical pin 19)
-# SCL = GPIO15 (physical pin 20)
-i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=100000)
+from drivers.sensor_sht31 import SHT31  
 
-# Create sensor object
+# I2C setup (Pico)
+i2c = I2C(
+    1,
+    scl=Pin(15),   # GPIO15 → pin 20
+    sda=Pin(14),   # GPIO14 → pin 19
+    freq=100000
+)
+
+# Create sensor
 sensor = SHT31(i2c)
 
 print("Starting SHT31 read test...")
