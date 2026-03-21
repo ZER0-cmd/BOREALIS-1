@@ -6,15 +6,20 @@ How to setup pico:
 
 How to setup vscode:
 
+to check what code is on pico currently::
+
+
+
 How to upload code to pico:
 
-enter these commands on the terminal
+mpremote fs ls :
 
-mpremote connect COMx fs cp main.py :main.py
-mpremote connect COMx fs cp config.py :config.py
-mpremote connect COMx fs cp -r app :/
-mpremote connect COMx fs cp -r drivers :/
-mpremote connect COMx fs cp -r scripts :/
+enter these commands on the terminal to upload code:
+
+mpremote fs cp -r . :
+
+Enter this command to reset and run pico:
+
 mpremote connect COMx reset
 
 make sure mpremote is installed first!
