@@ -74,3 +74,8 @@ class Ui:
         self.oled.fill(0)
         self.text_center("ERROR", 0)
         self.oled.text(str(msg)[:21], 0, 15)
+
+    def show_resetting(self):
+        self.oled.fill(0)
+        self._text_center("RESETTING...", 28)
+        self.oled.show()
