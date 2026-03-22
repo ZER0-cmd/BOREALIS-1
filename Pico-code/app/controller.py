@@ -6,9 +6,7 @@ from drivers.display_ssd1306 import SSD1306_I2C
 from drivers.output_led import LED
 from drivers.sd_detect import SdDetect
 from app.ui import Ui
-<<<<<<< HEAD
 from app.logging import SDlogger
-=======
 from app.sensor_manager import (
     SensorManager,
     SENSOR_NONE,
@@ -17,7 +15,6 @@ from app.sensor_manager import (
     SENSOR_MPU6500,
     SENSOR_UNKNOWN,
 )
->>>>>>> c6754dc53dc7bb917506c7ed4a7d55d3fad83edf
 
 
 class App:
