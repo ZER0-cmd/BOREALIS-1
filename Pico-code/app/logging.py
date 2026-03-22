@@ -3,7 +3,7 @@ import uos
 from drivers.sdcard import SDCard
 
 class SDlogger:
-    def __init__(self, spi, cs, file='data.csv', mount='/sd'):
+    def __init__(self, spi, cs, head, file='data.csv', mount='/sd'):
         self.sd = SDCard(spi, cs)
         self.mount = mount
         vfs = uos.VfsFat(self.sd)
@@ -13,11 +13,11 @@ class SDlogger:
             uos.umount(mount)
             uos.mount(vfs, mount)
         self._file = open(f'{self.mount}/{file}', 'a')
-        if headers:
-            self.write_headers(headers)
+        headers = open(f'{self.mount}/{file}', 'r').readline()
+        if not headers:
+            self.write_headers(head)
         else:
-            headers = open(f'{self.mount}/{file}', 'r').readline()
-            self._headers = headers.strip().split(',') if headers else None
+            self._headers = headers.strip().split(',')
     
     def write_headers(self, headers):
         self._headers = headers
@@ -26,7 +26,7 @@ class SDlogger:
         self._file.write('\n')
         self._file.flush()
 
-    def write_row(self, data:tuple) -> None:
+    def write_row(self, data) -> None:
         if self._headers is None:
             self.write_headers(data)
         if len(data) != len(self._headers):

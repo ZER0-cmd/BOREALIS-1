@@ -6,8 +6,8 @@ OLED_HEIGHT = 64
 OLED_I2C_ADDR = 0x3C
 OLED_SPLASH_MS = 3000
 
-# I2C bus (OLED + RTC + future sensors if needed)
-# GP0 = SDA, GP1 = SCL  (Pico physical pins 1 and 2)
+# OLED / RTC bus
+# GP0 = SDA, GP1 = SCL
 I2C_ID = 0
 I2C_SDA = 0
 I2C_SCL = 1
@@ -26,9 +26,8 @@ BUTTON_PULL = "down"
 BUTTON_ACTIVE_LEVEL = 1
 BUTTON_DEBOUNCE_MS = 50
 
-# LEDs
-RED_LED_PIN = 17
-GREEN_LED_PIN = 16
+# One status LED
+STATUS_LED_PIN = 2
 LED_ACTIVE_HIGH = True
 
 # SD Card (SPI1)

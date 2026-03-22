@@ -6,14 +6,27 @@ from drivers.display_ssd1306 import SSD1306_I2C
 from drivers.output_led import LED
 from drivers.sd_detect import SdDetect
 from app.ui import Ui
+<<<<<<< HEAD
 from app.logging import SDlogger
+=======
+from app.sensor_manager import (
+    SensorManager,
+    SENSOR_NONE,
+    SENSOR_HUMIDITY,
+    SENSOR_PRESSURE,
+    SENSOR_UNKNOWN,
+)
+>>>>>>> c6754dc53dc7bb917506c7ed4a7d55d3fad83edf
 
 
 class App:
     def __init__(self):
-        self.red_led = LED(config.RED_LED_PIN, active_high=config.LED_ACTIVE_HIGH)
-        self.green_led = LED(config.GREEN_LED_PIN, active_high=config.LED_ACTIVE_HIGH)
+        self.status_led = LED(
+            config.STATUS_LED_PIN,
+            active_high=config.LED_ACTIVE_HIGH
+        )
 
+        # OLED / RTC bus
         self.i2c = I2C(
             config.I2C_ID,
             sda=Pin(config.I2C_SDA),
@@ -37,44 +50,148 @@ class App:
 
         self.ui = Ui(self.oled)
 
-        # microSD detect input
         self.sd_detect = SdDetect(
             config.SD_DETECT_PIN,
             active_low=config.SD_DETECT_ACTIVE_LOW
         )
         self.sd = None
 
-    def run(self):
-        self.green_led.on()
+        self.sensor_manager = SensorManager()
+        self.last_sensor_read_ms = 0
 
-        # Splash screen
+    def _run_startup_checks(self):
+        """
+        Run startup checks during the splash screen.
+        Current check: microSD detect only.
+        """
+        start_ms = time.ticks_ms()
+        splash_ms = config.OLED_SPLASH_MS
+
+        led_state = False
+        last_toggle_ms = start_ms
+        blink_interval_ms = 100
+
+        sd_ok = False
+
+        while time.ticks_diff(time.ticks_ms(), start_ms) < splash_ms:
+            now = time.ticks_ms()
+
+            sd_ok = self.sd_detect.is_inserted()
+
+            if time.ticks_diff(now, last_toggle_ms) >= blink_interval_ms:
+                last_toggle_ms = now
+                led_state = not led_state
+                if led_state:
+                    self.status_led.on()
+                else:
+                    self.status_led.off()
+
+            time.sleep_ms(10)
+
+        return sd_ok
+
+    def _show_check_result(self, ok):
+        if ok:
+            self.status_led.off()
+            time.sleep_ms(80)
+
+            self.status_led.on()
+            time.sleep_ms(200)
+            self.status_led.off()
+            time.sleep_ms(120)
+
+            self.status_led.on()
+        else:
+            self.status_led.off()
+
+    def _sensor_name(self, kind):
+        if kind == SENSOR_HUMIDITY:
+            return "Humidity sensor"
+        if kind == SENSOR_PRESSURE:
+            return "Pressure sensor"
+        if kind == SENSOR_UNKNOWN:
+            return "Unknown sensor"
+        return "No sensor"
+
+    def run(self):
+        # 1. Boot splash stays exactly first
         self.ui.show_boot("pictures/logo.csv")
-        time.sleep_ms(config.OLED_SPLASH_MS)
-        # Live detect test screen
+
+        # 2. System checks happen during splash
+        system_ok = self._run_startup_checks()
+
+        # 3. Final LED state after startup checks
+        self._show_check_result(system_ok)
+
+        # 4. Only now start sensor logic
+        self.ui.show_sensor_disconnected()
+
         while True:
+            try:
+                changed, kind, adc_value = self.sensor_manager.refresh_connection()
+
+                if changed:
+                    if kind == SENSOR_NONE:
+                        self.ui.show_sensor_disconnected()
+                        time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
+                    elif kind == SENSOR_UNKNOWN:
+                        self.ui.show_unknown_sensor(adc_value)
+                        time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
+                    else:
+                        self.ui.show_sensor_connected(self._sensor_name(kind))
+                        time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
+
+                now = time.ticks_ms()
+                if time.ticks_diff(now, self.last_sensor_read_ms) >= config.SENSOR_READ_INTERVAL_MS:
+                    self.last_sensor_read_ms = now
+
+                    data = self.sensor_manager.read_data()
+
+                    if data is None:
+                        self.ui.show_sensor_disconnected()
+                    elif data["kind"] == SENSOR_UNKNOWN:
+                        self.ui.show_unknown_sensor(data["adc"])
+                    elif data["kind"] == SENSOR_HUMIDITY:
+                        self.ui.show_humidity_data(
+                            data["temperature_c"],
+                            data["humidity_percent"]
+                        )
+                    elif data["kind"] == SENSOR_PRESSURE:
+                        self.ui.show_pressure_data(
+                            data["temperature_c"],
+                            data["pressure_hpa"]
+                        )
+                    datakeys = [k for k in data.keys() if k != 'kind']
+
+            except Exception as e:
+                self.ui.show_error(str(e))
+            
+        
             inserted = self.sd_detect.is_inserted()
             
-            self.oled.fill(0)
-            self.oled.text("Borealis", 0, 0)
-            self.oled.text("microSD detect:", 0, 16)
-            self.oled.text("INSERTED" if inserted else "NOT INSERTED", 0, 30)
-            # self.oled.text("RAW: %d" % self.sd_detect.raw(), 0, 46)
+            # self.oled.fill(0)
+            # self.oled.text("Borealis", 0, 0)
+            # self.oled.text("microSD detect:", 0, 16)
+            # self.oled.text("INSERTED" if inserted else "NOT INSERTED", 0, 30)
+            # # self.oled.text("RAW: %d" % self.sd_detect.raw(), 0, 46)
 
             if inserted and self.sd is None:
                 try:
                     self.sd = SDlogger(SPI(config.SD_SPI_ID, config.SD_BAUDRATE, polarity=0, phase=0, sck=Pin(config.SD_SCK), mosi=Pin(config.SD_MOSI), miso=Pin(config.SD_MISO)),
                                        cs=Pin(config.SD_CS),
+                                       head=datakeys,
+                                       file=f'{data['kind']}.csv',
                                        mount=config.SD_MOUNT_POINT)
-                    self.oled.text('Status: Initialized', 0, 46)
+                    # self.oled.text('Status: Initialized', 0, 46)
                 except Exception as e:
                     self.oled.text("Status: Failed", 0, 46)
                 time.sleep(0.5)
             elif inserted:
-                self.sd.write_row((1,2,3,4))
-                self.oled.text("Status: Writing", 0, 46)
+                self.sd.write_row([data[k] for k in datakeys])
+                # self.oled.text("Status: Writing", 0, 46)
             else:
                 self.sd = None
                 self.oled.text("Status: Not found", 0, 46)
 
             self.oled.show()
-            time.sleep_ms(200)
+            time.sleep_ms(100)
