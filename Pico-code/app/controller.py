@@ -1,11 +1,12 @@
 import time
-from machine import Pin, I2C
+from machine import Pin, I2C, SPI
 
 import config
 from drivers.display_ssd1306 import SSD1306_I2C
 from drivers.output_led import LED
 from drivers.sd_detect import SdDetect
 from app.ui import Ui
+from app.logging import SDlogger
 
 
 class App:
@@ -41,6 +42,7 @@ class App:
             config.SD_DETECT_PIN,
             active_low=config.SD_DETECT_ACTIVE_LOW
         )
+        self.sd = None
 
     def run(self):
         self.green_led.on()
@@ -48,16 +50,31 @@ class App:
         # Splash screen
         self.ui.show_boot("pictures/logo.csv")
         time.sleep_ms(config.OLED_SPLASH_MS)
-
         # Live detect test screen
         while True:
             inserted = self.sd_detect.is_inserted()
-
+            
             self.oled.fill(0)
             self.oled.text("Borealis", 0, 0)
             self.oled.text("microSD detect:", 0, 16)
             self.oled.text("INSERTED" if inserted else "NOT INSERTED", 0, 30)
-            self.oled.text("RAW: %d" % self.sd_detect.raw(), 0, 46)
-            self.oled.show()
+            # self.oled.text("RAW: %d" % self.sd_detect.raw(), 0, 46)
 
+            if inserted and self.sd is None:
+                try:
+                    self.sd = SDlogger(SPI(config.SD_SPI_ID, config.SD_BAUDRATE, polarity=0, phase=0, sck=Pin(config.SD_SCK), mosi=Pin(config.SD_MOSI), miso=Pin(config.SD_MISO)),
+                                       cs=Pin(config.SD_CS),
+                                       mount=config.SD_MOUNT_POINT)
+                    self.oled.text('Status: Initialized', 0, 46)
+                except Exception as e:
+                    self.oled.text("Status: Failed", 0, 46)
+                time.sleep(0.5)
+            elif inserted:
+                self.sd.write_row((1,2,3,4))
+                self.oled.text("Status: Writing", 0, 46)
+            else:
+                self.sd = None
+                self.oled.text("Status: Not found", 0, 46)
+
+            self.oled.show()
             time.sleep_ms(200)
