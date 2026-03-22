@@ -1,4 +1,7 @@
-msremote rm -r :
-mpremote cp -r Pico-code :
+mpremote rm -r :
+cd Pico-code
+mpremote cp -r . :
+cd ..
 mpremote reset
-mpremote repl
+mpremote ls
+mpremote

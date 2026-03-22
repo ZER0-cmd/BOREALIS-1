@@ -125,7 +125,6 @@ class App:
                 changed, kind, adc_value = self.sensor_manager.refresh_connection()
 
                 if changed:
-                    print(kind)
                     if kind == SENSOR_NONE:
                         self.ui.show_sensor_disconnected()
                         self.oled.show()
@@ -135,7 +134,7 @@ class App:
                         self.oled.show()
                         time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
                     else:
-                        self.ui.show_sensor_connected(self._sensor_name(kind))
+                        self.ui.show_sensor_connected(self._sensor_name(kind), kind)
                         self.oled.show()
                         time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
 
