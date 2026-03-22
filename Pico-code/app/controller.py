@@ -191,16 +191,16 @@ class App:
                                        head=datakeys,
                                        file=f'{data['kind']}_{n//10}.csv',
                                        mount=config.SD_MOUNT_POINT)
-                    # self.oled.text('Status: Initialized', 0, 46)
+                    self.oled.text('SD: Initialized', 0, 46)
                 except Exception as e:
-                    self.oled.text("Status: Failed", 0, 46)
+                    self.oled.text("SD: Failed", 0, 5)
                 time.sleep(0.5)
             elif inserted:
                 self.sd.write_row([data[k] for k in datakeys])
-                # self.oled.text("Status: Writing", 0, 46)
+                self.oled.text("SD: Writing", 0, 46)
             else:
                 self.sd = None
-                self.oled.text("Status: Not found", 0, 46)
+                self.oled.text("SD: Not found", 0, 55)
 
             self.oled.show()
             time.sleep_ms(100)
