@@ -120,8 +120,9 @@ class App:
 
         # 4. Sensor logic only after boot phase
         self.ui.show_sensor_disconnected()
-
+        n = 0
         while True:
+            n += 1
             try:
                 changed, kind, adc_value = self.sensor_manager.refresh_connection()
 
@@ -188,7 +189,7 @@ class App:
                     self.sd = SDlogger(SPI(config.SD_SPI_ID, config.SD_BAUDRATE, polarity=0, phase=0, sck=Pin(config.SD_SCK), mosi=Pin(config.SD_MOSI), miso=Pin(config.SD_MISO)),
                                        cs=Pin(config.SD_CS),
                                        head=datakeys,
-                                       file=f'{data['kind']}_{'-'.join(map(str, time.localtime()[:6]))}.csv',
+                                       file=f'{data['kind']}_{n//10}.csv',
                                        mount=config.SD_MOUNT_POINT)
                     # self.oled.text('Status: Initialized', 0, 46)
                 except Exception as e:
