@@ -68,7 +68,6 @@ class Ui:
     def show_mpu6500_data(self, temp_c, ax, ay, az, gx, gy, gz):
         self.oled.fill(0)
         self.oled.text("MPU6500", 0, 0)
-        self.oled.text("T: %.1f C" % temp_c, 0, 10)
         self.oled.text("A X%.2f Y%.2f" % (ax, ay), 0, 24)
         self.oled.text("A Z%.2f g" % az, 0, 34)
         self.oled.text("G X%.0f Y%.0f" % (gx, gy), 0, 48)
