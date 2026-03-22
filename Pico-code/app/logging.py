@@ -21,8 +21,7 @@ class SDlogger:
     
     def write_headers(self, headers):
         self._headers = headers
-        for s in headers:
-            self._file.write(str(s) + ',')
+        self._file.write(','.join(headers))
         self._file.write('\n')
         self._file.flush()
 
@@ -31,8 +30,7 @@ class SDlogger:
             self.write_headers(data)
         if len(data) != len(self._headers):
             return
-        for d in data:
-            self._file.write('{:.2f}'.format(d) + ',')
+        self._file.write(','.join(['{:.2f}'.format(d) for d in data]))
         self._file.write('\n')
         self._file.flush()
 
