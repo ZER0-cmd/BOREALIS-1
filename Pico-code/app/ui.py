@@ -57,6 +57,16 @@ class Ui:
         self.oled.text("P: %.1f hPa" % pressure_hpa, 0, 38)
         self.oled.show()
 
+    def show_mpu6500_data(self, temp_c, ax, ay, az, gx, gy, gz):
+        self.oled.fill(0)
+        self.oled.text("MPU6500", 0, 0)
+        self.oled.text("T: %.1f C" % temp_c, 0, 10)
+        self.oled.text("A X%.2f Y%.2f" % (ax, ay), 0, 24)
+        self.oled.text("A Z%.2f g" % az, 0, 34)
+        self.oled.text("G X%.0f Y%.0f" % (gx, gy), 0, 48)
+        self.oled.text("G Z%.0f dps" % gz, 0, 58)
+        self.oled.show()
+
     def show_error(self, msg):
         self.oled.fill(0)
         self.oled.text("ERROR", 0, 0)

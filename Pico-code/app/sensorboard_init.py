@@ -69,28 +69,7 @@ class identify:
                     return sensor.co2
                 except Exception:
                     return 'NaN'
-         
-        elif rescheck(35):
-            try:
-                sensor = MPU6050(i2c=i2c)
-            except Exception as e:
-                safe.set_error(LEVEL_DEGRADED, 'MPU6050_init', e)
-            def _read():
-                try:
-                    return sensor.read_accel_data(), sensor.read_gyro_data()
-                except Exception:
-                    return 'NaN'
 
-        elif rescheck(40):
-            try:
-                sensor = MPU9250(i2c=i2c)
-            except Exception as e:
-                safe.set_error(LEVEL_DEGRADED, 'BMP390_init', e)
-            def _read():
-                try:
-                    return sensor.magnetic
-                except Exception:
-                    return 'NaN'
         else:
             safe.set_error(LEVEL_WARNING, "identify", Exception("Unknown sensor resistance:", resistance))
             self.sensor = None

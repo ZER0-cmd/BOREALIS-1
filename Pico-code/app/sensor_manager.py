@@ -1,14 +1,19 @@
 from machine import ADC, Pin, I2C
 import config
 
-from drivers.sensor_sht31 import SHT31 
+try:
+    from sensor_sht31 import SHT31
+except ImportError:
+    from drivers.sensor_sht31 import SHT31
 
 from drivers.bmp390 import BMP390
+from drivers.mpu6500 import MPU6500
 
 
 SENSOR_NONE = "none"
 SENSOR_HUMIDITY = "humidity"
 SENSOR_PRESSURE = "pressure"
+SENSOR_MPU6500 = "mpu6500"
 SENSOR_UNKNOWN = "unknown"
 
 
@@ -39,6 +44,9 @@ class SensorManager:
         if config.SENSOR_PRESSURE_MIN <= adc_value <= config.SENSOR_PRESSURE_MAX:
             return SENSOR_PRESSURE
 
+        if config.SENSOR_MPU6500_MIN <= adc_value <= config.SENSOR_MPU6500_MAX:
+            return SENSOR_MPU6500
+
         return SENSOR_UNKNOWN
 
     def connect_for_kind(self, kind):
@@ -63,6 +71,18 @@ class SensorManager:
             if last_exc:
                 raise last_exc
             raise RuntimeError("BMP390 not found")
+
+        if kind == SENSOR_MPU6500:
+            last_exc = None
+            for addr in (0x68, 0x69):
+                try:
+                    self.sensor = MPU6500(self.i2c, address=addr)
+                    return
+                except Exception as e:
+                    last_exc = e
+            if last_exc:
+                raise last_exc
+            raise RuntimeError("MPU6500 not found")
 
     def refresh_connection(self):
         adc_value = self.read_adc()
@@ -98,6 +118,22 @@ class SensorManager:
                 "kind": SENSOR_PRESSURE,
                 "temperature_c": temp_c,
                 "pressure_hpa": pressure_pa / 100.0,
+            }
+
+        if self.current_kind == SENSOR_MPU6500:
+            ax, ay, az = self.sensor.read_accel()
+            gx, gy, gz = self.sensor.read_gyro()
+            temp_c = self.sensor.read_temperature()
+
+            return {
+                "kind": SENSOR_MPU6500,
+                "temperature_c": temp_c,
+                "ax_g": ax,
+                "ay_g": ay,
+                "az_g": az,
+                "gx_dps": gx,
+                "gy_dps": gy,
+                "gz_dps": gz,
             }
 
         return None

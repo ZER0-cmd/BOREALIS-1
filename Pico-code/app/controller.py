@@ -11,6 +11,7 @@ from app.sensor_manager import (
     SENSOR_NONE,
     SENSOR_HUMIDITY,
     SENSOR_PRESSURE,
+    SENSOR_MPU6500,
     SENSOR_UNKNOWN,
 )
 
@@ -55,10 +56,6 @@ class App:
         self.last_sensor_read_ms = 0
 
     def _run_startup_checks(self):
-        """
-        Run startup checks during the splash screen.
-        Current check: microSD detect only.
-        """
         start_ms = time.ticks_ms()
         splash_ms = config.OLED_SPLASH_MS
 
@@ -70,7 +67,6 @@ class App:
 
         while time.ticks_diff(time.ticks_ms(), start_ms) < splash_ms:
             now = time.ticks_ms()
-
             sd_ok = self.sd_detect.is_inserted()
 
             if time.ticks_diff(now, last_toggle_ms) >= blink_interval_ms:
@@ -104,21 +100,23 @@ class App:
             return "Humidity sensor"
         if kind == SENSOR_PRESSURE:
             return "Pressure sensor"
+        if kind == SENSOR_MPU6500:
+            return "MPU6500"
         if kind == SENSOR_UNKNOWN:
             return "Unknown sensor"
         return "No sensor"
 
     def run(self):
-        # 1. Boot splash stays exactly first
+        # 1. Boot splash first
         self.ui.show_boot("pictures/logo.csv")
 
-        # 2. System checks happen during splash
+        # 2. System checks during splash
         system_ok = self._run_startup_checks()
 
-        # 3. Final LED state after startup checks
+        # 3. Final LED result
         self._show_check_result(system_ok)
 
-        # 4. Only now start sensor logic
+        # 4. Sensor logic only after boot phase
         self.ui.show_sensor_disconnected()
 
         while True:
@@ -144,17 +142,31 @@ class App:
 
                     if data is None:
                         self.ui.show_sensor_disconnected()
+
                     elif data["kind"] == SENSOR_UNKNOWN:
                         self.ui.show_unknown_sensor(data["adc"])
+
                     elif data["kind"] == SENSOR_HUMIDITY:
                         self.ui.show_humidity_data(
                             data["temperature_c"],
                             data["humidity_percent"]
                         )
+
                     elif data["kind"] == SENSOR_PRESSURE:
                         self.ui.show_pressure_data(
                             data["temperature_c"],
                             data["pressure_hpa"]
+                        )
+
+                    elif data["kind"] == SENSOR_MPU6500:
+                        self.ui.show_mpu6500_data(
+                            data["temperature_c"],
+                            data["ax_g"],
+                            data["ay_g"],
+                            data["az_g"],
+                            data["gx_dps"],
+                            data["gy_dps"],
+                            data["gz_dps"],
                         )
 
             except Exception as e:
