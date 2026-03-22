@@ -31,8 +31,10 @@ class Ui:
 
     def show_sensor_connected(self, name):
         self.oled.fill(0)
-        self.text_center("Connected:", 0)
-        self.oled.text(name, 0, 15)    
+        # self.text_center("Connected:", 0)
+        self.draw_image(f'pictures/{name}.csv')
+        print("drawn")
+        self.oled.text(name, 0, 44)    
 
     def show_sensor_disconnected(self):
         self.oled.fill(0)

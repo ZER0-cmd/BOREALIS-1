@@ -125,14 +125,20 @@ class App:
                 changed, kind, adc_value = self.sensor_manager.refresh_connection()
 
                 if changed:
+                    print(kind)
                     if kind == SENSOR_NONE:
                         self.ui.show_sensor_disconnected()
+                        self.oled.show()
                         time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
                     elif kind == SENSOR_UNKNOWN:
                         self.ui.show_unknown_sensor(adc_value)
+                        self.oled.show()
                         time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
                     else:
                         self.ui.show_sensor_connected(self._sensor_name(kind))
+                        self.oled.show()
+                        while True:
+                            time.sleep(1)
                         time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
 
                 now = time.ticks_ms()
