@@ -1,3 +1,4 @@
-msremote sync --mirror .
-msremote reset
-msremote
+msremote rm -r :
+mpremote cp -r Pico-code :
+mpremote reset
+mpremote repl
