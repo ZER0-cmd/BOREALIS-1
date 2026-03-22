@@ -1,7 +1,7 @@
 from PIL import Image
 from numpy import *
 
-def process(path, oleddim):
+def process(path, oleddim, invert=False):
     oleddim = array(oleddim)
     img = Image.open(path)
     dims = array([img.width, img.height])
@@ -12,12 +12,17 @@ def process(path, oleddim):
 
     img.show()
 
-    output = open(path[:-3]+'csv', 'w')
+    output = open(path[:-3] + 'csv', 'w')
+    output.write(f'{ndims[0]},{ndims[1]}\n')
     pixels = img.load()
     for x in range(ndims[0]):
         for y in range(ndims[1]):
-            v = 0 if pixels[x,y] > 125 else 1
+            v = 0 if (pixels[x,y] > 125 and invert) or pixels[x,y] <= 125 else 1
             output.write(f'{x},{y},{v}\n')
 
-for i in 'magnet', 'pressure', 'humidity', 'co2', 'acceleration':
-    process(f'{i}.png', [128, 40])
+# for i in 'magnet', 'pressure', 'humidity', 'co2', 'acceleration':
+#     process(f'{i}.png', [128, 40])
+
+process('co2.png', [128,40])
+
+# process('oledlogo.png', [128, 64], invert=True)

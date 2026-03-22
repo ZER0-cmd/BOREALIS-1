@@ -15,13 +15,18 @@ class Ui:
 
         self.oled.text(text, x, y)
 
-    def draw_image(self, path, x_offset=0, y_offset=0):
+    def draw_image(self, path, x_offset=0, y_offset=0, center=False):
         with open(path, "r") as file:
+            xdim = 0
+            ydim = 0
             for p in file:
                 p = p.strip().split(",")
                 if len(p) != 3:
+                    if len(p) == 2:
+                        xdim = int(p[0])
+                        ydim = int(p[1])
                     continue
-                self.oled.pixel(int(p[0]) + x_offset,
+                self.oled.pixel(int(p[0]) + x_offset + ((self.oled.width - xdim)//2 if center else 0),
                                 int(p[1]) + y_offset,
                                 int(p[2]))
 
@@ -32,7 +37,7 @@ class Ui:
     def show_sensor_connected(self, name, kind):
         self.oled.fill(0)
         # self.text_center("Connected:", 0)
-        self.draw_image(f'pictures/{kind}.csv')
+        self.draw_image(f'pictures/{kind}.csv',center=True)
         self.text_center(name, 55)    
 
     def show_sensor_disconnected(self):
