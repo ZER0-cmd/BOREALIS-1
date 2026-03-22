@@ -184,7 +184,7 @@ class App:
             # self.oled.text("INSERTED" if inserted else "NOT INSERTED", 0, 30)
             # # self.oled.text("RAW: %d" % self.sd_detect.raw(), 0, 46)
 
-            if (inserted and self.sd is None) or changed:
+            if inserted and (changed or self.sd is None):
                 try:
                     self.sd = SDlogger(SPI(config.SD_SPI_ID, config.SD_BAUDRATE, polarity=0, phase=0, sck=Pin(config.SD_SCK), mosi=Pin(config.SD_MOSI), miso=Pin(config.SD_MISO)),
                                        cs=Pin(config.SD_CS),
