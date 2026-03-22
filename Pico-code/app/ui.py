@@ -1,8 +1,24 @@
+from matplotlib import text
+
+
 class Ui:
     def __init__(self, oled):
         self.oled = oled
 
-    def _draw_image(self, path, x_offset=0, y_offset=0):
+    def text_center(self, text, y):
+        # Each character is ~8 pixels wide in MicroPython OLED font
+        char_width = 8
+        text_width = len(text) * char_width
+
+        # OLED width from display
+        screen_width = self.oled.width
+
+        # Calculate centered X position
+        x = max(0, (screen_width - text_width) // 2)
+
+        self.oled.text(text, x, y)
+
+    def draw_image(self, path, x_offset=0, y_offset=0):
         with open(path, "r") as file:
             for p in file:
                 p = p.strip().split(",")
@@ -14,13 +30,7 @@ class Ui:
 
     def show_boot(self, logo_path="pictures/logo.csv"):
         self.oled.fill(0)
-        self._draw_image(logo_path)
-        self.oled.show()
-
-    def show_idle(self):
-        self.oled.fill(0)
-        self.oled.text("Borealis", 0, 0)
-        self.oled.text("Waiting for sensor", 0, 20)
+        self.draw_image(logo_path)
         self.oled.show()
 
     def show_sensor_connected(self, name):

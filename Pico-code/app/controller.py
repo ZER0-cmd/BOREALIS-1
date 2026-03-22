@@ -143,6 +143,8 @@ class App:
 
                     data = self.sensor_manager.read_data()
 
+                    datakeys = []
+
                     if data is None:
                         self.ui.show_sensor_disconnected()
 
@@ -154,12 +156,14 @@ class App:
                             data["temperature_c"],
                             data["humidity_percent"]
                         )
+                        datakeys = ["temperature_c", "humidity_percent"]
 
                     elif data["kind"] == SENSOR_PRESSURE:
                         self.ui.show_pressure_data(
                             data["temperature_c"],
                             data["pressure_hpa"]
                         )
+                        datakeys = ["temperature_c", "pressure_hpa"]
 
                     elif data["kind"] == SENSOR_MPU6500:
                         self.ui.show_mpu6500_data(
@@ -171,11 +175,17 @@ class App:
                             data["gy_dps"],
                             data["gz_dps"],
                         )
+                        datakeys = [
+                            "temperature_c",
+                            "ax_g", "ay_g", "az_g",
+                            "gx_dps", "gy_dps", "gz_dps"
+                        ]
 
             except Exception as e:
                 self.ui.show_error(str(e))
+                print(e)
             
-            datakeys = [k for k in data.keys() if k != 'kind']
+            # datakeys = [k for k in data.keys() if k != 'kind']
             inserted = self.sd_detect.is_inserted()
             
             # self.oled.fill(0)
@@ -201,6 +211,6 @@ class App:
             else:
                 self.sd = None
                 self.oled.text("Status: Not found", 0, 46)
-
+            print(kind, n)
             self.oled.show()
             time.sleep_ms(100)
