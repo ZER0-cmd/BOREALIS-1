@@ -1,6 +1,3 @@
-from matplotlib import text
-
-
 class Ui:
     def __init__(self, oled):
         self.oled = oled

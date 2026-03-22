@@ -16,6 +16,7 @@ try:
     from app.controller import App
     App().run()
 except Exception as e:
+    print(e)
     # FATAL boot failure:
     # stay here so the error can be inspected in REPL
     blink(20)
