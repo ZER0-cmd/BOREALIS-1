@@ -18,5 +18,6 @@ try:
 except Exception as e:
     # FATAL boot failure:
     # stay here so the error can be inspected in REPL
+    blink(20)
     while True:
         pass

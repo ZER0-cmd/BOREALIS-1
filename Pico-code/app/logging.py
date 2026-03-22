@@ -1,69 +1,39 @@
-import uos as os
+import machine
+import uos
+from drivers.sdcard import SDCard
 
-
-class SdLogger:
-    """
-    Handles SD mount + CSV file lifecycle.
-    """
-    def __init__(self, mount_point="/sd"):
-        self.mount_point = mount_point
-        self.sd_ok = False
-        self._mounted = False
-        self._file = None
-        self._path = None
-        self._headers = None
-
-    def mount(self, sdcard_block_device) -> bool:
-        """
-        Mount the SD card block device using VfsFat.
-        Returns True if mounted OK.
-        """
+class SDlogger:
+    def __init__(self, spi, cs, head, file='data.csv', mount='/sd'):
+        self.sd = SDCard(spi, cs)
+        self.mount = mount
+        vfs = uos.VfsFat(self.sd)
         try:
-            vfs = os.VfsFat(sdcard_block_device)
-            os.mount(vfs, self.mount_point)
-            self.sd_ok = True
-            self._mounted = True
-            return True
-        except Exception:
-            self.sd_ok = False
-            self._mounted = False
-            return False
-
-    def start_new(self, start_utc_iso: str) -> str | None:
-        """
-        Create a new CSV file and open it for append.
-        Returns path if created, else None.
-        """
-        if not self.sd_ok:
-            return None
-
-        # Example: 20251206T121200Z.csv (safe filename)
-        fn_safe = start_utc_iso.replace("-", "").replace(":", "")
-        path = "%s/%s.csv" % (self.mount_point, fn_safe)
-
-        # Write header
-        with open(path, "w") as f:
-            f.write("utc_iso,temp_c,humidity_percent\n")
-
-        self._file = open(path, "a")
-        self._path = path
-        return path
+            uos.mount(vfs, mount)
+        except OSError:
+            uos.umount(mount)
+            uos.mount(vfs, mount)
+        self._file = open(f'{self.mount}/{file}', 'a')
+        headers = open(f'{self.mount}/{file}', 'r').readline()
+        if not headers:
+            self.write_headers(head)
+        else:
+            self._headers = headers.strip().split(',')
     
     def write_headers(self, headers):
         self._headers = headers
         for s in headers:
-            self._file.write(s + ',')
+            self._file.write(str(s) + ',')
         self._file.write('\n')
         self._file.flush()
 
-    def write_row(self, data:tuple) -> None:
-        if not self._file:
-            return
+    def write_row(self, data) -> None:
         if self._headers is None:
             self.write_headers(data)
-        if len(data) != len(self.headers):
+        if len(data) != len(self._headers):
             return
-        self._file.write("%s,%.2f,%.2f\n" % data)
+        for d in data:
+            self._file.write('{:.2f}'.format(d) + ',')
+        self._file.write('\n')
         self._file.flush()
 
     def stop(self) -> None:
@@ -78,7 +48,13 @@ class SdLogger:
                 pass
         self._file = None
         self._path = None
-
-    @property
-    def current_path(self):
-        return self._path
+    
+    def wipe(self):
+        files = uos.listdir(self.mount)
+        for file in files:
+            uos.remove(f'{self.mount}/{file}')
+    
+    def ls(self, source=None):
+        if source is None:
+            source = self.mount
+        return uos.listdir(source)

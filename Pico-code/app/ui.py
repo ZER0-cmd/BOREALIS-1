@@ -8,11 +8,9 @@ class Ui:
                 p = p.strip().split(",")
                 if len(p) != 3:
                     continue
-                self.oled.pixel(
-                    int(p[0]) + x_offset,
-                    int(p[1]) + y_offset,
-                    int(p[2])
-                )
+                self.oled.pixel(int(p[0]) + x_offset,
+                                int(p[1]) + y_offset,
+                                int(p[2]))
 
     def show_boot(self, logo_path="pictures/logo.csv"):
         self.oled.fill(0)

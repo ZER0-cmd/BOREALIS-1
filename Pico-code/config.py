@@ -33,11 +33,14 @@ LED_ACTIVE_HIGH = True
 # SD Card (SPI1)
 SD_SPI_ID = 1
 SD_SCK = 10
-SD_MOSI = 11
-SD_MISO = 12
-SD_CS = 13
+SD_MOSI = 11 #RX
+SD_MISO = 8 #TX
+SD_CS = 9
 SD_BAUDRATE = 1_000_000
 SD_MOUNT_POINT = "/sd"
+
+# Sampling / UI update
+SAMPLE_INTERVAL_MS = 1000
 
 # Sensor identification ADC
 SENSOR_ID_ADC_PIN = 28
