@@ -111,15 +111,13 @@ class App:
     def run(self):
         # 1. Boot splash first
         self.ui.show_boot("pictures/logo.csv")
+        self.oled.show()
 
         # 2. System checks during splash
         system_ok = self._run_startup_checks()
 
         # 3. Final LED result
         self._show_check_result(system_ok)
-
-        # 4. Sensor logic only after boot phase
-        self.ui.show_sensor_disconnected()
         n = 0
         while True:
             n += 1
@@ -201,7 +199,7 @@ class App:
                                        head=datakeys,
                                        file=f'{data['kind']}_{n//10}.csv',
                                        mount=config.SD_MOUNT_POINT)
-                    self.oled.text('SD: Initialized', 0, 45)
+                    self.oled.text('SD: Initialized', 0, 55)
                 except Exception as e:
                     self.oled.text("SD: Failed", 0, 55)
                 time.sleep(0.5)
@@ -211,6 +209,5 @@ class App:
             else:
                 self.sd = None
                 self.oled.text("SD: Not found", 0, 55)
-
             self.oled.show()
             time.sleep_ms(100)
