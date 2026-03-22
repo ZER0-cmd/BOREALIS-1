@@ -137,8 +137,6 @@ class App:
                     else:
                         self.ui.show_sensor_connected(self._sensor_name(kind))
                         self.oled.show()
-                        while True:
-                            time.sleep(1)
                         time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
 
                 now = time.ticks_ms()
