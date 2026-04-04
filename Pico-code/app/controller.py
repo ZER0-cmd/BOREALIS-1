@@ -150,7 +150,7 @@ class App:
                             self.oled.show()
                             time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
                         else:
-                            self.ui.show_sensor_connected(self._sensor_name(kind))
+                            self.ui.show_sensor_connected(self._sensor_name(kind), kind)
                             self.oled.show()
                             time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
 
