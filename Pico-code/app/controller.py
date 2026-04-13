@@ -6,7 +6,7 @@ from drivers.display_ssd1306 import SSD1306_I2C
 from drivers.output_led import LED
 from drivers.sd_detect import SdDetect
 from app.ui import Ui
-from app.logging import SDlogger
+from app import logging
 from app.sensor_manager import (
     SensorManager,
     SENSOR_NONE,
@@ -213,17 +213,15 @@ class App:
 
                 if inserted and (changed or self.sd is None):
                     try:
-                        self.sd = SDlogger(SPI(config.SD_SPI_ID, config.SD_BAUDRATE, polarity=0, phase=0, sck=Pin(config.SD_SCK), mosi=Pin(config.SD_MOSI), miso=Pin(config.SD_MISO)),
-                                        cs=Pin(config.SD_CS),
-                                        head=datakeys,
-                                        file=f'{data['kind']}_{n//10}.csv',
-                                        mount=config.SD_MOUNT_POINT)
+                        self.sd = logging.SDCard(SPI(config.SD_SPI_ID, config.SD_BAUDRATE, polarity=0, phase=0, sck=Pin(config.SD_SCK), mosi=Pin(config.SD_MOSI), miso=Pin(config.SD_MISO)), cs=Pin(config.SD_CS))
+                        file = logging.newfile(self.sd, 'data.csv')
+                        file.write_headers(datakeys)
                         self.oled.text('SD: Initialized', 0, 55)
                     except Exception as e:
                         self.oled.text("SD: Failed", 0, 55)
                     time.sleep(0.5)
                 elif inserted:
-                    self.sd.write_row([data[k] for k in datakeys])
+                    file.write_row([data[k] for k in datakeys])
                     self.oled.text("SD: Writing", 0, 55)
                 else:
                     self.sd = None

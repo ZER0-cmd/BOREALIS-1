@@ -39,9 +39,9 @@ class SSD1306:
             SET_DISP | 0x00,                 # display off
             SET_MEM_ADDR, 0x00,              # horizontal addressing
             SET_DISP_START_LINE | 0x00,
-            SET_SEG_REMAP | 0x01,            # column address 127 mapped to SEG0
+            SET_SEG_REMAP | 0x00,            # column address 127 mapped to SEG0
             SET_MUX_RATIO, self.height - 1,
-            SET_COM_OUT_DIR | 0x08,          # scan from COM[N] to COM0
+            SET_COM_OUT_DIR | 0x00,          # scan from COM[N] to COM0
             SET_DISP_OFFSET, 0x00,
             SET_COM_PIN_CFG, 0x02 if self.height == 32 else 0x12,
             SET_DISP_CLK_DIV, 0x80,
