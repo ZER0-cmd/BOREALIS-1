@@ -43,6 +43,17 @@ class MMC5603:
         except OSError:
             return False
 
+    def set_resolution(self, mode):
+        """
+        mode 0: 20-bit (6.6ms)
+        mode 1: 18-bit (3.5ms)
+        mode 2: 16-bit (2.0ms)
+        """
+        # We read CTRL1, clear the bottom 2 bits, and set the new mode
+        current_ctrl1 = self._read_registers(self.CTRL1, 1)[0]
+        new_ctrl1 = (current_ctrl1 & 0xFC) | (mode & 0x03)
+        self._write_register(self.CTRL1, new_ctrl1)
+
     def read_raw(self):
         """
         Triggers a measurement and reads the 20-bit raw data.
@@ -73,8 +84,8 @@ class MMC5603:
         z_raw = (data[4] << 12) | (data[5] << 4) | (data[8] >> 4)
 
         # Subtract the zero-field offset to get signed values
-        x = x_raw - self.OFFSET
-        y = y_raw - self.OFFSET
-        z = z_raw - self.OFFSET
+        x = (x_raw - self.OFFSET) / 16384
+        y = (y_raw - self.OFFSET) / 16384
+        z = (z_raw - self.OFFSET) / 16384
 
         return x, y, z
