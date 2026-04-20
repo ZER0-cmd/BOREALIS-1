@@ -4,4 +4,4 @@ BOREALIS är ett projekt för högstadieelever som syftar till att introducera u
 
 
 
-<img width="1507" height="1320" alt="image" src="https://github.com/user-attachments/assets/c1487a2a-37cc-4f75-b3b6-277a745319c2" />
+<img width="1507" height="1320" alt="image" src="Pictures/432432423 (1).jpg" />
