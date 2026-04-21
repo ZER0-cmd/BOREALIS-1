@@ -16,23 +16,25 @@ class loadfile():
         self._headers = open(f'{self.mount}/{path}', 'r').readline()
     
     def write_headers(self, *headers):
-        if type(headers[0]) != str:
+        if not isinstance(headers[0], str):
             headers = headers[0]
-        self._headers = headers
-        self._file.write(','.join(headers) + '\n')
+        self._headers = [str(h) for h in headers]
+        self._file.write(','.join(self._headers) + '\n')
 
         self._file.flush()
 
     def write_row(self, *data) -> None:
-        if type(data[0]) != str:
+        if not isinstance(data[0], str):
             data = data[0]
         if self._headers is None:
+            self._headers = data
             self.write_headers(data)
         if len(data) != len(self._headers):
             return
+        data = [str(d) for d in data]
         self._file.write(','.join(data) + '\n')
         self._file.flush()
-
+    
     def stop(self) -> None:
         if self._file:
             try:
@@ -45,16 +47,6 @@ class loadfile():
                 pass
         self._file = None
         self.path = None
-    
-    def wipe(self):
-        files = uos.listdir(self.mount)
-        for file in files:
-            uos.remove(f'{self.mount}/{file}')
-    
-    def ls(self, source=None):
-        if source is None:
-            source = self.mount
-        return uos.listdir(source)
 
 class newfile(loadfile):
     def __init__(self, sd, path:str, mount='/sd'):
@@ -70,12 +62,27 @@ class newfile(loadfile):
         if '.' in path:
             path = path.split('.')[:-1]
         path = '.'.join(path)
-        if uos.path.exists(f'{self.mount}/{path + 'csv'}'):
+
+        def file_exists(filepath):
+            try:
+                uos.stat(filepath)
+                return True
+            except OSError:
+                return False
+        
+        if file_exists(f'{self.mount}/{path + '.csv'}'):
             n = 1
-            while uos.path.exists(f'{self.mount}/{path + str(n) + 'csv'}'):
+            while file_exists(f'{self.mount}/{path + str(n) + '.csv'}'):
                 n += 1
             path += str(n)
         path += '.csv'
 
         self._file = open(f'{self.mount}/{path}', 'w')
         self.path = path
+    
+def wipe(mount='/sd', unmount=False):
+    files = uos.listdir(mount)
+    for file in files:
+        uos.remove(f'{mount}/{file}')
+    if unmount:
+        uos.umount(mount)

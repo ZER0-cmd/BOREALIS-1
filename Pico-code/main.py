@@ -1,24 +1,16 @@
-import time
+from app.controller import library
 from machine import Pin
+import time
+main = library()
 
-onboard = Pin(25, Pin.OUT)
+def setup():
+    main.newfile('data.csv')
+    main.log_headers()
 
-def blink(n, on=0.12, off=0.12):
-    for _ in range(n):
-        onboard.on()
-        time.sleep(on)
-        onboard.off()
-        time.sleep(off)
+def loop():
+    data = main.read_sensor()
+    print(data)
+    print(main.ready)
+    main.log_data(data)
 
-blink(1)
-
-try:
-    from app.controller import App
-    App().run()
-except Exception as e:
-    print(e)
-    # FATAL boot failure:
-    # stay here so the error can be inspected in REPL
-    blink(20)
-    while True:
-        pass
+main.run(setup, loop)

@@ -82,6 +82,6 @@ def update(frame):
 
 anim = FuncAnimation(fig, update, frames=n_frames, init_func=init, blit=True)
 
-anim.save('vectorplot.mp4', writer='ffmpeg', fps=20)
+# anim.save('vectorplot.mp4', writer='ffmpeg', fps=20)
 
 plt.show()
