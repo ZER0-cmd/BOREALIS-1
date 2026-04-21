@@ -80,9 +80,6 @@ class newfile(loadfile):
         self._file = open(f'{self.mount}/{path}', 'w')
         self.path = path
     
-def wipe(mount='/sd', unmount=False):
-    files = uos.listdir(mount)
-    for file in files:
-        uos.remove(f'{mount}/{file}')
-    if unmount:
-        uos.umount(mount)
+def wipe(sd):
+    if sd is not None:
+        uos.VfsFat.mkfs(sd)

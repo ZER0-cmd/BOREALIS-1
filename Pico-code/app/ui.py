@@ -77,5 +77,5 @@ class Ui:
 
     def show_resetting(self):
         self.oled.fill(0)
-        self._text_center("RESETTING...", 28)
+        self.text_center("RESETTING...", 28)
         self.oled.show()

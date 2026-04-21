@@ -1,10 +1,7 @@
 from machine import ADC, Pin, I2C
 import config
 
-try:
-    from sensor_sht31 import SHT31
-except ImportError:
-    from drivers.sensor_sht31 import SHT31
+from drivers.sensor_sht31 import SHT31
 
 from drivers.bmp390 import BMP390
 from drivers.mpu6500 import MPU6500

@@ -24,11 +24,9 @@ class core:
             active_high=config.LED_ACTIVE_HIGH
         )
 
-        self.reset_pin = Pin(config.RESET_PIN, Pin.IN, Pin.PULL_DOWN)
-
         self.reset_manager = ResetManager(
-        self.reset_pin,
-        active_high=config.RESET_ACTIVE_HIGH
+        Pin(config.RESET1_PIN, Pin.IN, Pin.PULL_DOWN),
+        Pin(config.RESET2_PIN, Pin.IN, Pin.PULL_DOWN),
         )
 
         # OLED / RTC bus
@@ -200,6 +198,12 @@ class core:
         self.oled.show()
         time.sleep_ms(100)
 
+    def resetmanager(self):
+        if self.reset_manager.is_triggered():
+                self.ui.show_resetting()
+                self.oled.show()
+                self.reset_manager.perform_reset(self.sd)
+
 class library(core):
     def __init__(self):
         core.__init__(self)
@@ -218,20 +222,17 @@ class library(core):
         self._show_check_result(system_ok)
         self.experimentmanager()
         while not self.ready:
+            self.resetmanager
             self.sdmanager()
 
         setup()
 
         while True:
-            if self.reset_manager.is_triggered():
-                self.ui.show_resetting()
-                self.oled.show()
-                self.reset_manager.perform_reset(config.SD_MOUNT_POINT)
+            self.resetmanager()
 
-            else:
-                self.experimentmanager()
-                self.sdmanager()
-                loop()
+            self.experimentmanager()
+            self.sdmanager()
+            loop()
     
     def newfile(self, path):
         if self.ready:
