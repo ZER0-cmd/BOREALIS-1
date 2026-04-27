@@ -11,7 +11,22 @@ SENSOR_NONE = "none"
 SENSOR_HUMIDITY = "humidity"
 SENSOR_PRESSURE = "pressure"
 SENSOR_MPU6500 = "mpu6500"
+SENSOR_LIGHT = "uv"
+SENSOR_GAS = "gas"
+SENSOR_SOLAR = "solar"
+SENSOR_TEMP = "temperature"
 SENSOR_UNKNOWN = "unknown"
+
+SENSOR_MAP = [
+    (config.SENSOR_NONE_ID, SENSOR_NONE),
+    (config.SENSOR_HUMIDITY_ID, SENSOR_HUMIDITY),
+    (config.SENSOR_PRESSURE_ID, SENSOR_PRESSURE),
+    (config.SENSOR_MPU6500_ID, SENSOR_MPU6500),
+    (config.SENSOR_GAS_ID, SENSOR_GAS),
+    (config.SENSOR_LIGHT_ID, SENSOR_LIGHT),
+    (config.SENSOR_SOLAR_ID, SENSOR_SOLAR),
+    (config.SENSOR_TEMP_ID, SENSOR_TEMP)
+]
 
 
 class SensorManager:
@@ -32,17 +47,11 @@ class SensorManager:
         return self.adc.read_u16()
 
     def classify(self, adc_value):
-        if config.SENSOR_NONE_MIN <= adc_value <= config.SENSOR_NONE_MAX:
-            return SENSOR_NONE
+        rangechk = lambda x, r : r[0] <= x < r[1]
 
-        if config.SENSOR_HUMIDITY_MIN <= adc_value <= config.SENSOR_HUMIDITY_MAX:
-            return SENSOR_HUMIDITY
-
-        if config.SENSOR_PRESSURE_MIN <= adc_value <= config.SENSOR_PRESSURE_MAX:
-            return SENSOR_PRESSURE
-
-        if config.SENSOR_MPU6500_MIN <= adc_value <= config.SENSOR_MPU6500_MAX:
-            return SENSOR_MPU6500
+        for id, kind in SENSOR_MAP:
+            if rangechk(adc_value, id):
+                return kind
 
         return SENSOR_UNKNOWN
 
