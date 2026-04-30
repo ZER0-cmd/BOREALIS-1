@@ -113,7 +113,7 @@ class SensorManager:
 
     def read_data(self):
         def adc():
-            return self.sensor.read_voltage(0)
+            return self.sensor.read_voltage(2)
 
         if self.current_kind == SENSOR_NONE:
             return None
