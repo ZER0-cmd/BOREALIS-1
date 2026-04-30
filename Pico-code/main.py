@@ -10,7 +10,7 @@ def setup():
 def loop():
     data = main.read_sensor()
     print(data)
-    print(main.ready)
+    # print(main.ready)
     main.log_data(data)
 
 main.run(setup, loop)

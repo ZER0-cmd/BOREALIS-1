@@ -37,7 +37,10 @@ class Ui:
     def show_sensor_connected(self, name, kind):
         self.oled.fill(0)
         # self.text_center("Connected:", 0)
-        self.draw_image(f'pictures/{kind}.csv',center=True)
+        try:
+            self.draw_image(f'pictures/{kind}.csv',center=True)
+        except OSError:
+            pass
         self.text_center(name, 55)    
 
     def show_sensor_disconnected(self):
@@ -69,6 +72,16 @@ class Ui:
         self.oled.text("A Z%.2f g" % az, 0, 25)
         self.oled.text("G X%.0f Y%.0f" % (gx, gy), 0, 35)
         self.oled.text("G Z%.0f dps" % gz, 0, 45)
+
+    def show_temp_data(self, temp):
+        self.oled.fill(0)
+        self.text_center("Temperature", 0)
+        self.oled.text("Temp: %.2f C" % temp, 0, 15)
+    
+    def show_solar_data(self, v):
+        self.oled.fill(0)
+        self.text_center("Solar", 0)
+        self.oled.text("Voltage: %.2f V" % v, 0, 15)
 
     def show_error(self, msg):
         self.oled.fill(0)

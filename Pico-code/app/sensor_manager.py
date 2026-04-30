@@ -5,6 +5,7 @@ from drivers.sensor_sht31 import SHT31
 
 from drivers.bmp390 import BMP390
 from drivers.mpu6500 import MPU6500
+from drivers.ADS1115 import ADS1115
 
 
 SENSOR_NONE = "none"
@@ -38,6 +39,13 @@ class SensorManager:
             sda=Pin(config.SENSOR_I2C_SDA),
             scl=Pin(config.SENSOR_I2C_SCL),
             freq=config.SENSOR_I2C_FREQ,
+        )
+
+        self.i2c_adc = I2C(
+            config.ADC_I2C_ID,
+            sda=Pin(config.ADC_I2C_SDA),
+            scl=Pin(config.ADC_I2C_SCL),
+            freq=config.ADC_I2C_FREQ,
         )
 
         self.current_kind = None
@@ -89,6 +97,9 @@ class SensorManager:
             if last_exc:
                 raise last_exc
             raise RuntimeError("MPU6500 not found")
+        
+        if kind in (SENSOR_TEMP, SENSOR_GAS, SENSOR_LIGHT, SENSOR_SOLAR):
+            self.sensor = ADS1115(self.i2c_adc)
 
     def refresh_connection(self):
         adc_value = self.read_adc()
@@ -101,6 +112,9 @@ class SensorManager:
         return changed, kind, adc_value
 
     def read_data(self):
+        def adc():
+            return self.sensor.read_voltage(0)
+
         if self.current_kind == SENSOR_NONE:
             return None
 
@@ -141,5 +155,26 @@ class SensorManager:
                 "gy_dps": gy,
                 "gz_dps": gz,
             }
+        
+        if self.current_kind == SENSOR_TEMP:
+            v = adc()
+            temp = (v - 1.25) / 0.005
+            return {
+                "kind" : SENSOR_TEMP,
+                "temperature_c" : temp
+                }
+
+        if self.current_kind == SENSOR_GAS:
+            pass
+
+        if self.current_kind == SENSOR_LIGHT:
+            pass
+
+        if self.current_kind == SENSOR_SOLAR:
+            v = adc()
+            return {
+                "kind" : SENSOR_SOLAR,
+                "voltage" : v
+                }
 
         return None

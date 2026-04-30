@@ -14,6 +14,10 @@ from app.sensor_manager import (
     SENSOR_PRESSURE,
     SENSOR_MPU6500,
     SENSOR_UNKNOWN,
+    SENSOR_GAS,
+    SENSOR_LIGHT,
+    SENSOR_SOLAR,
+    SENSOR_TEMP
 )
 
 
@@ -138,11 +142,7 @@ class core:
         if time.ticks_diff(now, self.last_sensor_read_ms) >= config.SENSOR_READ_INTERVAL_MS:
             self.last_sensor_read_ms = now
 
-            try:
-                self.data = self.sensor_manager.read_data()
-            except Exception as e:
-                print(e)
-                self.data = None
+            self.data = self.sensor_manager.read_data()
 
             self.datakeys = []
 
@@ -168,6 +168,17 @@ class core:
                 ]
                 show = self.ui.show_mpu6500_data
             
+            elif self.data["kind"] == SENSOR_SOLAR:
+                self.datakeys = ['voltage']
+                show = self.ui.show_solar_data
+
+            elif self.data["kind"] == SENSOR_TEMP:
+                self.datakeys = ["temperature_c"]
+                show = self.ui.show_temp_data
+            
+            else:
+                show = self.ui.show_unknown_sensor
+
             show(*(self.data[k] for k in self.datakeys))
     
     def sdmanager(self):
@@ -221,9 +232,9 @@ class library(core):
         system_ok = self._run_startup_checks()
         self._show_check_result(system_ok)
         self.experimentmanager()
-        while not self.ready:
-            self.resetmanager
-            self.sdmanager()
+        # while not self.ready:
+        #     self.resetmanager()
+        #     self.sdmanager()
 
         setup()
 
