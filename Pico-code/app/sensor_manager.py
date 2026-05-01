@@ -1,4 +1,5 @@
 from machine import ADC, Pin, I2C
+import time
 import config
 
 from drivers.sensor_sht31 import SHT31
@@ -6,29 +7,35 @@ from drivers.sensor_sht31 import SHT31
 from drivers.bmp390 import BMP390
 from drivers.mpu6500 import MPU6500
 from drivers.ADS1115 import ADS1115
+from drivers.mmc5603 import MMC5603
+from drivers import ltr390
 
 
-SENSOR_NONE = "none"
-SENSOR_HUMIDITY = "humidity"
-SENSOR_PRESSURE = "pressure"
-SENSOR_MPU6500 = "mpu6500"
-SENSOR_LIGHT = "uv"
-SENSOR_GAS = "gas"
-SENSOR_SOLAR = "solar"
-SENSOR_TEMP = "temperature"
+SENSOR_NONE = config.SENSOR_NONE_ID
+SENSOR_CO2 = config.SENSOR_CO2_ID
+SENSOR_HUMIDITY = config.SENSOR_HUMIDITY_ID
+SENSOR_PRESSURE = config.SENSOR_PRESSURE_ID
+SENSOR_MPU6500 = config.SENSOR_MPU6500_ID
+SENSOR_LIGHT = config.SENSOR_LIGHT_ID 
+SENSOR_GAS = config.SENSOR_GAS_ID
+SENSOR_SOLAR = config.SENSOR_SOLAR_ID
+SENSOR_TEMP = config.SENSOR_TEMP_ID
+SENSOR_MAGNET = config.SENSOR_MAGNETOMETER_ID
 SENSOR_UNKNOWN = "unknown"
 
-SENSOR_MAP = [
-    (config.SENSOR_NONE_ID, SENSOR_NONE),
-    (config.SENSOR_HUMIDITY_ID, SENSOR_HUMIDITY),
-    (config.SENSOR_PRESSURE_ID, SENSOR_PRESSURE),
-    (config.SENSOR_MPU6500_ID, SENSOR_MPU6500),
-    (config.SENSOR_GAS_ID, SENSOR_GAS),
-    (config.SENSOR_LIGHT_ID, SENSOR_LIGHT),
-    (config.SENSOR_SOLAR_ID, SENSOR_SOLAR),
-    (config.SENSOR_TEMP_ID, SENSOR_TEMP)
-]
-
+SENSOR_NAMES = {
+    SENSOR_NONE : "No sensor",
+    SENSOR_HUMIDITY : 'Humidity sensor',
+    SENSOR_PRESSURE : 'Barometer',
+    SENSOR_MPU6500 : 'Accelerometer',
+    SENSOR_LIGHT : 'Light sensor',
+    SENSOR_GAS : 'Gas sensor',
+    SENSOR_SOLAR : 'Solar panel',
+    SENSOR_TEMP : 'Termometer',
+    SENSOR_CO2 : 'CO2 sensor',
+    SENSOR_MAGNET : 'Magnetometer',
+    SENSOR_UNKNOWN : "Unknown sensor"
+}
 
 class SensorManager:
     def __init__(self):
@@ -51,17 +58,17 @@ class SensorManager:
         self.current_kind = None
         self.sensor = None
 
-    def read_adc(self):
+    def read_adc(self): # ID
         return self.adc.read_u16()
+    
+    def _adc(self): # Actual ADC
+        return self.sensor.read_voltage(config.ADC_CHANNEL)
 
     def classify(self, adc_value):
-        rangechk = lambda x, r : r[0] <= x < r[1]
-
-        for id, kind in SENSOR_MAP:
-            if rangechk(adc_value, id):
-                return kind
-
-        return SENSOR_UNKNOWN
+        closest = min([SENSOR_NONE, SENSOR_GAS, SENSOR_HUMIDITY, SENSOR_LIGHT, SENSOR_MPU6500, SENSOR_PRESSURE, SENSOR_SOLAR, SENSOR_TEMP, SENSOR_CO2], key=lambda x : abs(x-adc_value))
+        if abs(adc_value - closest) > 3000:
+            return SENSOR_UNKNOWN
+        return closest
 
     def connect_for_kind(self, kind):
         self.sensor = None
@@ -98,7 +105,20 @@ class SensorManager:
                 raise last_exc
             raise RuntimeError("MPU6500 not found")
         
-        if kind in (SENSOR_TEMP, SENSOR_GAS, SENSOR_LIGHT, SENSOR_SOLAR):
+        if kind == SENSOR_LIGHT:
+            self.sensor = ltr390.LTR390(self.i2c)
+            self.gain = 1
+            self.sensor.set_gain(ltr390.GAINS[self.gain])
+            self.sensor.set_resolution(config.UV_RESOLUTION)
+            self.sensor.enable_uv()
+            time.sleep_ms(self.sensor._int_ms + 10)
+        
+        if kind == SENSOR_MAGNET:
+            self.sensor = MMC5603(self.i2c)
+            self.sensor.set_resolution(0)
+            self.qcal = self.sensor.read_raw()
+        
+        if kind in (SENSOR_TEMP, SENSOR_SOLAR, SENSOR_GAS):
             self.sensor = ADS1115(self.i2c_adc)
 
     def refresh_connection(self):
@@ -112,8 +132,6 @@ class SensorManager:
         return changed, kind, adc_value
 
     def read_data(self):
-        def adc():
-            return self.sensor.read_voltage(2)
 
         if self.current_kind == SENSOR_NONE:
             return None
@@ -136,8 +154,8 @@ class SensorManager:
             temp_c, pressure_pa = self.sensor.read()
             return {
                 "kind": SENSOR_PRESSURE,
-                "temperature_c": temp_c,
                 "pressure_hpa": pressure_pa / 100.0,
+                "temperature_c" : temp_c
             }
 
         if self.current_kind == SENSOR_MPU6500:
@@ -157,7 +175,7 @@ class SensorManager:
             }
         
         if self.current_kind == SENSOR_TEMP:
-            v = adc()
+            v = self._adc()
             temp = (v - 1.25) / 0.005
             return {
                 "kind" : SENSOR_TEMP,
@@ -165,16 +183,50 @@ class SensorManager:
                 }
 
         if self.current_kind == SENSOR_GAS:
-            pass
+            v = self._adc()
+            return {'kind': SENSOR_GAS,
+                    'alcohol': 1.5*v}
+            
 
         if self.current_kind == SENSOR_LIGHT:
-            pass
+            # Can read ambient light too using .read_als() but was to tired to do.
+            uv = self.sensor.read_uv()
+            vmax = 2**config.UV_RESOLUTION
+            if uv > .7*vmax and self.gain > 0:
+                while uv > .7*vmax and self.gain > 1:
+                    self.gain -= 1
+                    self.sensor.set_gain(ltr390.GAINS[self.gain])
+                    time.sleep_ms(self.sensor._int_ms + 10)
+                    uv = self.sensor.read_uv()
+            else:
+                while uv < .1*vmax and self.gain < 4:
+                    self.gain += 1
+                    self.sensor.set_gain(ltr390.GAINS[self.gain])
+                    time.sleep_ms(self.sensor._int_ms + 10)
+                    uv = self.sensor.read_uv()
+            
+            return {
+                'kind' : SENSOR_LIGHT,
+                'uvindex': self.sensor.uv_index(uv)
+            }
 
         if self.current_kind == SENSOR_SOLAR:
-            v = adc()
+            v = self._adc()
             return {
                 "kind" : SENSOR_SOLAR,
                 "voltage" : v
                 }
+        if self.current_kind == SENSOR_MAGNET:
+            x,y,z = self.sensor.read_raw()
+            qx,qy,qz = self.qcal
+            return {
+                'kind': SENSOR_MAGNET,
+                'rx': x,
+                'x': x - qx,
+                'ry': y,
+                'y': y - qy,
+                'rz': z,
+                'z': z - qz
+            }
 
         return None

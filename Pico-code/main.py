@@ -4,13 +4,14 @@ import time
 main = library()
 
 def setup():
+    # while not main.log_ready:
     main.newfile('data.csv')
     main.log_headers()
 
 def loop():
     data = main.read_sensor()
-    print(data)
-    # print(main.ready)
+    if data != None:
+        print(data)
     main.log_data(data)
 
 main.run(setup, loop)

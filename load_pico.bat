@@ -1,7 +1,6 @@
+@echo off
 mpremote rm -r :
-cd Pico-code
-mpremote cp -r . :
-cd ..
+mpremote cp -r Pico-code\* :
 mpremote reset
-mpremote ls
-mpremote
+ping -n 1 -w 500 127.0.0.1 >nul
+mpremote repl

@@ -34,11 +34,11 @@ class Ui:
         self.oled.fill(0)
         self.draw_image(logo_path)    
 
-    def show_sensor_connected(self, name, kind):
+    def show_sensor_connected(self, name):
         self.oled.fill(0)
         # self.text_center("Connected:", 0)
         try:
-            self.draw_image(f'pictures/{kind}.csv',center=True)
+            self.draw_image(f'pictures/{name}.csv',center=True)
         except OSError:
             pass
         self.text_center(name, 55)    
@@ -53,19 +53,19 @@ class Ui:
         self.text_center("Unknown", 0)
         self.oled.text("ADC: %d" % adc_value, 0, 15)
         
-    def show_humidity_data(self, temp_c, humidity):
+    def show_humidity_data(self, humidity):
         self.oled.fill(0)
         self.text_center("Humidity sensor", 0)
-        self.oled.text("Temp: %.1f C" % temp_c, 0, 15)
-        self.oled.text("RH: %.1f %%" % humidity, 0, 25)
+        # self.oled.text("Temp: %.1f C" % temp_c, 0, 15)
+        self.oled.text("RH: %.1f %%" % humidity, 0, 15)
 
-    def show_pressure_data(self, temp_c, pressure_hpa):
+    def show_pressure_data(self, pressure_hpa):
         self.oled.fill(0)
         self.text_center("Pressure sensor", 0)
-        self.oled.text("Temp: %.1f C" % temp_c, 0, 15)
-        self.oled.text("P: %.1f hPa" % pressure_hpa, 0, 25)
+        # self.oled.text("Temp: %.1f C" % temp_c, 0, 15)
+        self.oled.text("P: %.1f hPa" % pressure_hpa, 0, 15)
 
-    def show_mpu6500_data(self, temp_c, ax, ay, az, gx, gy, gz):
+    def show_mpu6500_data(self, ax, ay, az, gx, gy, gz):
         self.oled.fill(0)
         self.text_center("MPU6500", 0)
         self.oled.text("A X%.2f Y%.2f" % (ax, ay), 0, 15)
@@ -82,6 +82,21 @@ class Ui:
         self.oled.fill(0)
         self.text_center("Solar", 0)
         self.oled.text("Voltage: %.2f V" % v, 0, 15)
+    
+    def show_light_data(self, uv):
+        self.oled.fill(0)
+        self.text_center("UV", 0)
+        self.oled.text("UV-index: %.1f" % uv, 0, 15)
+    
+    def show_gas_data(self, v):
+        self.oled.fill(0)
+        self.text_center("Alcohol", 0)
+        self.oled.text("Presence: %.2f" % v, 0, 15)
+        
+    def show_magnet_data(self,x,y,z):
+        self.oled.fill(0)
+        self.text_center("Magnetic strength", 0)
+        self.oled.text("X%d Y%d Z%d" % (x,y,z), 0, 15)
 
     def show_error(self, msg):
         self.oled.fill(0)

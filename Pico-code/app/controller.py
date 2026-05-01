@@ -17,7 +17,9 @@ from app.sensor_manager import (
     SENSOR_GAS,
     SENSOR_LIGHT,
     SENSOR_SOLAR,
-    SENSOR_TEMP
+    SENSOR_TEMP,
+    SENSOR_MAGNET,
+    SENSOR_NAMES
 )
 
 
@@ -66,7 +68,7 @@ class core:
         self.sensor_manager = SensorManager()
         self.last_sensor_read_ms = 0
 
-        self.ready = False
+        self.log_ready = False
         self.data = {}
         self.datakeys = []
 
@@ -110,17 +112,6 @@ class core:
         else:
             self.status_led.off()
 
-    def _sensor_name(self, kind):
-        if kind == SENSOR_HUMIDITY:
-            return "Humidity sensor"
-        if kind == SENSOR_PRESSURE:
-            return "Pressure sensor"
-        if kind == SENSOR_MPU6500:
-            return "MPU6500"
-        if kind == SENSOR_UNKNOWN:
-            return "Unknown sensor"
-        return "No sensor"
-
     def experimentmanager(self):
         self.changed, kind, adc_value = self.sensor_manager.refresh_connection()
 
@@ -134,7 +125,7 @@ class core:
                 self.oled.show()
                 time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
             else:
-                self.ui.show_sensor_connected(self._sensor_name(kind), kind)
+                self.ui.show_sensor_connected(SENSOR_NAMES[kind])
                 self.oled.show()
                 time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
 
@@ -144,42 +135,50 @@ class core:
 
             self.data = self.sensor_manager.read_data()
 
-            self.datakeys = []
-
             if self.data is None:
                 self.ui.show_sensor_disconnected()
-
-            elif self.data["kind"] == SENSOR_UNKNOWN:
-                self.ui.show_unknown_sensor(self.data["adc"])
-
-            elif self.data["kind"] == SENSOR_HUMIDITY:
-                self.datakeys = ["temperature_c", "humidity_percent"]
-                show = self.ui.show_humidity_data
-
-            elif self.data["kind"] == SENSOR_PRESSURE:
-                self.datakeys = ["temperature_c", "pressure_hpa"]
-                show = self.ui.show_pressure_data
-
-            elif self.data["kind"] == SENSOR_MPU6500:
-                self.datakeys = [
-                    "temperature_c",
-                    "ax_g", "ay_g", "az_g",
-                    "gx_dps", "gy_dps", "gz_dps"
-                ]
-                show = self.ui.show_mpu6500_data
-            
-            elif self.data["kind"] == SENSOR_SOLAR:
-                self.datakeys = ['voltage']
-                show = self.ui.show_solar_data
-
-            elif self.data["kind"] == SENSOR_TEMP:
-                self.datakeys = ["temperature_c"]
-                show = self.ui.show_temp_data
-            
             else:
-                show = self.ui.show_unknown_sensor
 
-            show(*(self.data[k] for k in self.datakeys))
+                if self.data["kind"] == SENSOR_HUMIDITY:
+                    self.datakeys = ["humidity_percent"]
+                    show = self.ui.show_humidity_data
+
+                elif self.data["kind"] == SENSOR_PRESSURE:
+                    self.datakeys = ["pressure_hpa"]
+                    show = self.ui.show_pressure_data
+
+                elif self.data["kind"] == SENSOR_MPU6500:
+                    self.datakeys = [
+                        "ax_g", "ay_g", "az_g",
+                        "gx_dps", "gy_dps", "gz_dps"
+                    ]
+                    show = self.ui.show_mpu6500_data
+                
+                elif self.data["kind"] == SENSOR_SOLAR:
+                    self.datakeys = ['voltage']
+                    show = self.ui.show_solar_data
+
+                elif self.data["kind"] == SENSOR_TEMP:
+                    self.datakeys = ["temperature_c"]
+                    show = self.ui.show_temp_data
+                
+                elif self.data["kind"] == SENSOR_GAS:
+                    self.datakeys = ["alcohol"]
+                    show = self.ui.show_gas_data
+                
+                elif self.data["kind"] == SENSOR_LIGHT:
+                    self.datakeys = ["uvindex"]
+                    show = self.ui.show_light_data
+                
+                elif self.data["kind"] == SENSOR_MAGNET:
+                    self.datakeys = ['x', 'y', 'z']
+                    show = self.ui.show_magnet_data
+
+                else:
+                    self.datakeys = ['adc']
+                    show = self.ui.show_unknown_sensor
+
+                show(*(self.data[k] for k in self.datakeys))
     
     def sdmanager(self):
         self.inserted = self.sd_detect.is_inserted()
@@ -194,17 +193,17 @@ class core:
             try:
                 self.sd = logging.SDCard(SPI(config.SD_SPI_ID, config.SD_BAUDRATE, polarity=0, phase=0, sck=Pin(config.SD_SCK), mosi=Pin(config.SD_MOSI), miso=Pin(config.SD_MISO)), cs=Pin(config.SD_CS))
                 self.oled.text('SD: Initialized', 0, 55)
-                self.ready = True
+                self.log_ready = True
             except Exception as e:
                 self.oled.text("SD: Failed", 0, 55)
-                self.ready = False
+                self.log_ready = False
             time.sleep(0.5)
         elif self.inserted:
-            self.ready = True
+            self.log_ready = True
             self.oled.text("SD: Inserted", 0, 55)
         else:
             self.sd = None
-            self.ready = False
+            self.log_ready = False
             self.oled.text("SD: Not found", 0, 55)
         self.oled.show()
         time.sleep_ms(100)
@@ -224,7 +223,8 @@ class library(core):
         if filter == None:
             filter = self.datakeys
         filter = list(filter)
-        return [self.data[k] for k in filter]
+        if self.data is not None:
+            return [self.data[k] for k in filter]
 
     def run(self, setup, loop):
         self.ui.show_boot()
@@ -232,7 +232,7 @@ class library(core):
         system_ok = self._run_startup_checks()
         self._show_check_result(system_ok)
         self.experimentmanager()
-        # while not self.ready:
+        # while not self.log_ready:
         #     self.resetmanager()
         #     self.sdmanager()
 
@@ -246,15 +246,24 @@ class library(core):
             loop()
     
     def newfile(self, path):
-        if self.ready:
+        '''
+        If log_ready creates a new file at path adn load it
+        '''
+        if self.log_ready:
             self.file = logging.newfile(self.sd, path)
     
     def loadfile(self, path):
-        if self.ready:
+        '''
+        If log_ready loads existing file at path
+        '''
+        if self.log_ready:
             self.file = logging.loadfile(self.sd, path)
         
     def log_data(self, data):
-        if self.file is not None and self.ready:
+        '''
+        If log_ready logs data in the loaded file
+        '''
+        if self.file is not None and self.log_ready:
             for i in range(20):
                 try:
                     self.file.write_row(data)
@@ -264,7 +273,10 @@ class library(core):
                     time.sleep_ms(50)
 
     def log_headers(self, headers=None):
-        if self.file is not None and self.ready:
+        '''
+        If log_ready creates headers (names measured quantities) in the loaded file
+        '''
+        if self.file is not None and self.log_ready:
             for i in range(20):
                 try:
                     if headers is None:
