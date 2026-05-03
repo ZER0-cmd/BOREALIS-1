@@ -124,8 +124,8 @@ class SensorManager:
     def refresh_connection(self):
         adc_value = self.read_adc()
         kind = self.classify(adc_value)
-
-        changed = (kind != self.current_kind)
+        
+        changed = (kind != self.current_kind) and (self.current_kind == SENSOR_NONE)
         if changed:
             self.connect_for_kind(kind)
 
@@ -204,7 +204,7 @@ class SensorManager:
                     self.sensor.set_gain(ltr390.GAINS[self.gain])
                     time.sleep_ms(self.sensor._int_ms + 10)
                     uv = self.sensor.read_uv()
-            
+            time.sleep_ms(self.sensor._int_ms + 10)
             return {
                 'kind' : SENSOR_LIGHT,
                 'uvindex': self.sensor.uv_index(uv)

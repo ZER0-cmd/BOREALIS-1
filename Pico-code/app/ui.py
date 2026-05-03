@@ -90,7 +90,7 @@ class Ui:
     
     def show_gas_data(self, v):
         self.oled.fill(0)
-        self.text_center("Alcohol", 0)
+        self.text_center("MQ-Sensor", 0)
         self.oled.text("Presence: %.2f" % v, 0, 15)
         
     def show_magnet_data(self,x,y,z):
