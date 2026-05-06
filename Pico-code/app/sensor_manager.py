@@ -57,6 +57,8 @@ class SensorManager:
 
         self.current_kind = None
         self.sensor = None
+        self._pending = None
+        self._pcount = 0
 
     def read_adc(self): # ID
         return self.adc.read_u16()
@@ -125,11 +127,17 @@ class SensorManager:
         adc_value = self.read_adc()
         kind = self.classify(adc_value)
         
-        changed = (kind != self.current_kind) and (self.current_kind == SENSOR_NONE)
-        if changed:
-            self.connect_for_kind(kind)
+        if kind == self._pending:
+            self._pcount += 1
+        else:
+            self._pending = kind
+            self._pcount = 1
 
-        return changed, kind, adc_value
+        if self._pcount >= 5 and kind != self.current_kind:
+            self.connect_for_kind(kind)
+            return True, kind, adc_value
+
+        return False, kind, adc_value
 
     def read_data(self):
 
