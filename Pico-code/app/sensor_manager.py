@@ -1,6 +1,7 @@
 from machine import ADC, Pin, I2C
 import time
 import config
+import gc
 
 from drivers.sensor_sht31 import SHT31
 
@@ -78,50 +79,56 @@ class SensorManager:
 
         if kind == SENSOR_NONE:
             return
+        try:
+            if kind == SENSOR_HUMIDITY:
+                self.sensor = SHT31(self.i2c)
+                return
 
-        if kind == SENSOR_HUMIDITY:
-            self.sensor = SHT31(self.i2c)
-            return
+            if kind == SENSOR_PRESSURE:
+                last_exc = None
+                for addr in (0x77, 0x76):
+                    try:
+                        self.sensor = BMP390(self.i2c, address=addr)
+                        return
+                    except Exception as e:
+                        last_exc = e
+                if last_exc:
+                    raise last_exc
+                raise RuntimeError("BMP390 not found")
 
-        if kind == SENSOR_PRESSURE:
-            last_exc = None
-            for addr in (0x77, 0x76):
-                try:
-                    self.sensor = BMP390(self.i2c, address=addr)
-                    return
-                except Exception as e:
-                    last_exc = e
-            if last_exc:
-                raise last_exc
-            raise RuntimeError("BMP390 not found")
-
-        if kind == SENSOR_MPU6500:
-            last_exc = None
-            for addr in (0x68, 0x69):
-                try:
-                    self.sensor = MPU6500(self.i2c, address=addr)
-                    return
-                except Exception as e:
-                    last_exc = e
-            if last_exc:
-                raise last_exc
-            raise RuntimeError("MPU6500 not found")
+            if kind == SENSOR_MPU6500:
+                last_exc = None
+                for addr in (0x68, 0x69):
+                    try:
+                        self.sensor = MPU6500(self.i2c, address=addr)
+                        return
+                    except Exception as e:
+                        last_exc = e
+                if last_exc:
+                    raise last_exc
+                raise RuntimeError("MPU6500 not found")
+            
+            if kind == SENSOR_LIGHT:
+                self.sensor = ltr390.LTR390(self.i2c)
+                self.gain = 1
+                self.sensor.set_gain(ltr390.GAINS[self.gain])
+                self.sensor.set_resolution(config.UV_RESOLUTION)
+                self.sensor.enable_uv()
+                self.sensor.enable_als()
+                time.sleep_ms(self.sensor._int_ms + 10)
+            
+            if kind == SENSOR_MAGNET:
+                self.sensor = MMC5603(self.i2c)
+                self.sensor.set_resolution(0)
+                self.qcal = self.sensor.read_raw()
+            
+            if kind in (SENSOR_TEMP, SENSOR_SOLAR, SENSOR_GAS):
+                self.sensor = ADS1115(self.i2c_adc)
+        except Exception as e:
+            self.current_kind = SENSOR_UNKNOWN
+            self.sensor = None
         
-        if kind == SENSOR_LIGHT:
-            self.sensor = ltr390.LTR390(self.i2c)
-            self.gain = 1
-            self.sensor.set_gain(ltr390.GAINS[self.gain])
-            self.sensor.set_resolution(config.UV_RESOLUTION)
-            self.sensor.enable_uv()
-            time.sleep_ms(self.sensor._int_ms + 10)
-        
-        if kind == SENSOR_MAGNET:
-            self.sensor = MMC5603(self.i2c)
-            self.sensor.set_resolution(0)
-            self.qcal = self.sensor.read_raw()
-        
-        if kind in (SENSOR_TEMP, SENSOR_SOLAR, SENSOR_GAS):
-            self.sensor = ADS1115(self.i2c_adc)
+        time.sleep_ms(20)
 
     def refresh_connection(self):
         adc_value = self.read_adc()
@@ -133,14 +140,14 @@ class SensorManager:
             self._pending = kind
             self._pcount = 1
 
-        if self._pcount >= 5 and kind != self.current_kind:
+        if self._pcount >= 8 and kind != self.current_kind:
             self.connect_for_kind(kind)
+            gc.collect()
             return True, kind, adc_value
 
         return False, kind, adc_value
 
     def read_data(self):
-
         if self.current_kind == SENSOR_NONE:
             return None
 

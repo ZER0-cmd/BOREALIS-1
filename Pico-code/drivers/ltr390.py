@@ -106,18 +106,11 @@ class LTR390:
 
     def enable_uv(self, standby=False):
         """Enable UV sensor (and take it out of standby)."""
-        ctrl = self._read_u8(_LTR390_MAIN_CTRL)
-        ctrl &= ~0x01          # clear standby (0 = active)
-        if standby:
-            ctrl |= 0x01       # set standby if requested
-        ctrl |= 0x04           # UVS enable (bit2)
-        self._write_u8(_LTR390_MAIN_CTRL, ctrl)
+        self._write_u8(_LTR390_MAIN_CTRL, 0x0A)
 
-    def disable(self):
-        """Put sensor into standby (low power)."""
-        ctrl = self._read_u8(_LTR390_MAIN_CTRL)
-        ctrl |= 0x01          # standby bit
-        self._write_u8(_LTR390_MAIN_CTRL, ctrl)
+    def enable_als(self):
+        self._write_u8(_LTR390_MAIN_CTRL, 0x02)
+
 
     def read_uv(self):
         """Return raw 20‑bit UV sensor reading."""
