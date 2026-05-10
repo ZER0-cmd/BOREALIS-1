@@ -76,7 +76,9 @@ class SensorManager:
     def connect_for_kind(self, kind):
         self.sensor = None
         self.current_kind = kind
+        gc.collect()
 
+        time.sleep_ms(20)
         if kind == SENSOR_NONE:
             return
         try:
@@ -116,19 +118,19 @@ class SensorManager:
                 self.sensor.enable_uv()
                 self.sensor.enable_als()
                 time.sleep_ms(self.sensor._int_ms + 10)
+                return
             
             if kind == SENSOR_MAGNET:
                 self.sensor = MMC5603(self.i2c)
                 self.sensor.set_resolution(0)
                 self.qcal = self.sensor.read_raw()
+                return
             
             if kind in (SENSOR_TEMP, SENSOR_SOLAR, SENSOR_GAS):
                 self.sensor = ADS1115(self.i2c_adc)
         except Exception as e:
             self.current_kind = SENSOR_UNKNOWN
             self.sensor = None
-        
-        time.sleep_ms(20)
 
     def refresh_connection(self):
         adc_value = self.read_adc()
@@ -142,7 +144,6 @@ class SensorManager:
 
         if self._pcount >= 8 and kind != self.current_kind:
             self.connect_for_kind(kind)
-            gc.collect()
             return True, kind, adc_value
 
         return False, kind, adc_value

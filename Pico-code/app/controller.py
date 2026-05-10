@@ -1,6 +1,5 @@
 import time
-from machine import Pin, I2C, SPI
-from app.reset_manager import ResetManager
+from machine import Pin, I2C, SPI, reset
 import config
 from drivers.display_ssd1306 import SSD1306_I2C
 from drivers.output_led import LED
@@ -22,18 +21,15 @@ from app.sensor_manager import (
     SENSOR_NAMES
 )
 
-
 class core:
     def __init__(self):
         self.status_led = LED(
             config.STATUS_LED_PIN,
             active_high=config.LED_ACTIVE_HIGH
         )
-
-        self.reset_manager = ResetManager(
-        Pin(config.RESET1_PIN, Pin.IN, Pin.PULL_DOWN),
-        Pin(config.RESET2_PIN, Pin.IN, Pin.PULL_DOWN),
-        )
+        
+        self.reset1 = Pin(config.RESET1_PIN, Pin.IN, Pin.PULL_DOWN),
+        self.reset2 = Pin(config.RESET2_PIN, Pin.IN, Pin.PULL_DOWN),
 
         # OLED / RTC bus
         self.i2c = I2C(
@@ -43,21 +39,7 @@ class core:
             freq=config.I2C_FREQ,
         )
 
-        addrs = self.i2c.scan()
-        if config.OLED_I2C_ADDR not in addrs:
-            raise OSError(
-                "OLED not found at address 0x%02X. Found: %s"
-                % (config.OLED_I2C_ADDR, [hex(a) for a in addrs])
-            )
-
-        self.oled = SSD1306_I2C(
-            config.OLED_WIDTH,
-            config.OLED_HEIGHT,
-            self.i2c,
-            addr=config.OLED_I2C_ADDR,
-        )
-
-        self.ui = Ui(self.oled)
+        self.oled = None
 
         self.sd_detect = SdDetect(
             config.SD_DETECT_PIN,
@@ -111,6 +93,21 @@ class core:
             self.status_led.on()
         else:
             self.status_led.off()
+
+    def oledmanager(self):
+        if config.OLED_I2C_ADDR in self.i2c.scan():
+            if self.oled == None:
+                self.oled = SSD1306_I2C(
+                    config.OLED_WIDTH,
+                    config.OLED_HEIGHT,
+                    self.i2c,
+                    addr=config.OLED_I2C_ADDR,
+                )
+                
+        else:
+            self.oled = None
+        
+        self.ui = Ui(self.oled)
 
     def experimentmanager(self):
         self.changed, kind, adc_value = self.sensor_manager.refresh_connection()
@@ -175,11 +172,11 @@ class core:
                     show = self.ui.show_magnet_data
 
                 else:
-                    self.datakeys = ['adc']
-                    show = self.ui.show_unknown_sensor
+                    show = self.ui.show_unknown_sensor(self.data['adc'])
+                    return
 
                 show(*(self.data[k] for k in self.datakeys))
-    
+
     def sdmanager(self):
         self.inserted = self.sd_detect.is_inserted()
         
@@ -208,25 +205,38 @@ class core:
         self.oled.show()
         time.sleep_ms(100)
 
-    def resetmanager(self):
-        if self.reset_manager.is_triggered():
-                self.ui.show_resetting()
-                self.oled.show()
-                self.reset_manager.perform_reset(self.sd)
-
 class library(core):
     def __init__(self):
         core.__init__(self)
         self.file = None
+        self.cshift = 0
+        self.cscale = 1
+        self.filter = None
+    
+    def resetmanager(self):
+        def trigger():
+            return self.reset1 == 1 or self.reset2 == 1
+        if trigger:
+            for i in range(10):
+                time.sleep(0.2)
+                if not trigger():
+                    for i in range(100):
+                        if trigger():
+                            self.newfile(config.DEFAULT_FILE_NAME)
+                        time.sleep(0.1)
+                    return
+                reset()
 
     def read_sensor(self, filter=None):
+        self.filter = filter
         if filter == None:
             filter = self.datakeys
         filter = list(filter)
         if self.data is not None:
-            return [self.data[k] for k in filter]
+            return [self.data[k] * self.cscale[k] + self.cshift[k] for k in filter]
 
     def run(self, setup, loop):
+        self.oledmanager()
         self.ui.show_boot()
         self.oled.show()
         system_ok = self._run_startup_checks()
@@ -240,12 +250,13 @@ class library(core):
 
         while True:
             self.resetmanager()
+            self.oledmanager()
 
             self.experimentmanager()
             self.sdmanager()
             loop()
     
-    def newfile(self, path):
+    def newfile(self, path=config.DEFAULT_FILE_NAME):
         '''
         If log_ready creates a new file at path adn load it
         '''
@@ -286,3 +297,47 @@ class library(core):
                 except Exception as e:
                     print(e)
                     time.sleep_ms(50)
+                        
+    def calibrate(self, value, value2=None, le=50):
+        if self.data is None or self.data['kind'] == SENSOR_UNKNOWN:
+            self.ui.show_calibration_abort(f'Cannot calibrate\nsensor')
+            return
+        filter = self.filter
+        if filter is None:
+            filter = self.datakeys
+        try:
+            # First measurement set (e.g., low reference)
+            acc1 = [0.0 for _ in filter]
+            for i in range(le):
+                self.oledmanager
+                self.resetmanager()
+                data = self.sensor_manager.read_data()
+                # incremental average
+                acc1 = [(a + data[k]) / (i+1) for a, k in zip(acc1, filter)]
+
+            if value2 is not None:
+                input('Change to value2. Then hit any button')
+                # Second measurement set (e.g., high reference)
+                acc2 = [0.0 for _ in filter]
+                for i in range(le):
+                    self.oledmanager
+                    self.resetmanager()
+                    data = self.sensor_manager.read_data()
+                    acc2 = [(a + data[k]) / (i+1) for a, k in zip(acc2, filter)]
+
+                # Two‑point calibration: compute scale and offset for each channel
+                # Calibrated = raw * scale + offset
+                # value = acc1 * scale + offset
+                # value2 = acc2 * scale + offset
+                v1_list = list(value) if hasattr(value, '__iter__') else [value]
+                v2_list = list(value2) if hasattr(value2, '__iter__') else [value2]
+                self.cscale = [(v2 - v1) / (a2 - a1) for v1, v2, a1, a2 in zip(v1_list, v2_list, acc1, acc2)]
+                self.cshift = [v1 - a1 * s for v1, a1, s in zip(v1_list, acc1, self.cscale)]
+            else:
+                # One‑point calibration: assume scale = 1, compute only offset
+                v_list = list(value) if hasattr(value, '__iter__') else [value]
+                self.cscale = dict(zip(filter, [1.0] * len(v_list)))
+                self.cshift = dict(zip(filter, [v - a for v, a in zip(v_list, acc1)]))
+
+        except Exception as e:
+            print('Calibration failed:', e)

@@ -1,3 +1,20 @@
+def guard(method):
+    def wrapped(self, *args, **kwargs):
+        if self.oled is None:
+            return None
+        return method(self, *args, **kwargs)
+    return wrapped
+
+def applyguard(cls):
+    for attr_name in dir(cls):
+        if attr_name.startswith('_'):
+            continue
+        attr = getattr(cls, attr_name)
+        if callable(attr):
+            setattr(cls, attr_name, guard(attr))
+    return cls
+
+@applyguard
 class Ui:
     def __init__(self, oled):
         self.oled = oled
@@ -107,3 +124,15 @@ class Ui:
         self.oled.fill(0)
         self.text_center("RESETTING...", 28)
         self.oled.show()
+
+    def show_calibrating(self, sensor):
+        self.oled.fill(0)
+        self.text_center(str(sensor), 0)
+        self.oled.text('CALIBRATING', 15)
+        self.oled.text('Do not move', 25)
+    
+    def show_calibration_abort(self, msg):
+        self.oled.fill(0)
+        self.text_center('CALIBRATON', 0)
+        self.text_center('FAILED', 10)
+        self.text_center(str(msg), 25)

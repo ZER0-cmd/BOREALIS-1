@@ -21,7 +21,6 @@ SET_PRECHARGE = const(0xD9)
 SET_VCOM_DESEL = const(0xDB)
 SET_CHARGE_PUMP = const(0x8D)
 
-
 class SSD1306:
     def __init__(self, width, height, external_vcc):
         self.width = width
@@ -124,30 +123,3 @@ class SSD1306_I2C(SSD1306):
 
     def write_data(self, buf):
         self.i2c.writeto(self.addr, b"\x40" + buf)
-
-
-class SSD1306_SPI(SSD1306):
-    def __init__(self, width, height, spi, dc, res, cs, external_vcc=False):
-        self.rate = 10 * 1024 * 1024
-        dc.init(dc.OUT, value=0)
-        res.init(res.OUT, value=0)
-        cs.init(cs.OUT, value=1)
-        self.spi = spi
-        self.dc = dc
-        self.res = res
-        self.cs = cs
-        super().__init__(width, height, external_vcc)
-
-    def write_cmd(self, cmd):
-        self.spi.init(baudrate=self.rate, polarity=0, phase=0)
-        self.cs.value(0)
-        self.dc.value(0)
-        self.spi.write(bytearray([cmd]))
-        self.cs.value(1)
-
-    def write_data(self, buf):
-        self.spi.init(baudrate=self.rate, polarity=0, phase=0)
-        self.cs.value(0)
-        self.dc.value(1)
-        self.spi.write(buf)
-        self.cs.value(1)
