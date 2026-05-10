@@ -68,7 +68,7 @@ class SensorManager:
         return self.sensor.read_voltage(config.ADC_CHANNEL)
 
     def classify(self, adc_value):
-        closest = min([SENSOR_NONE, SENSOR_GAS, SENSOR_HUMIDITY, SENSOR_LIGHT, SENSOR_MPU6500, SENSOR_PRESSURE, SENSOR_SOLAR, SENSOR_TEMP, SENSOR_CO2], key=lambda x : abs(x-adc_value))
+        closest = min([SENSOR_NONE, SENSOR_GAS, SENSOR_HUMIDITY, SENSOR_LIGHT, SENSOR_MPU6500, SENSOR_PRESSURE, SENSOR_SOLAR, SENSOR_TEMP, SENSOR_CO2, SENSOR_MAGNET], key=lambda x : abs(x-adc_value))
         if abs(adc_value - closest) > 3000:
             return SENSOR_UNKNOWN
         return closest
@@ -206,26 +206,29 @@ class SensorManager:
 
         if self.current_kind == SENSOR_LIGHT:
             # Can read ambient light too using .read_als() but was to tired to do.
-            uv = self.sensor.read_uv()
-            vmax = 2**config.UV_RESOLUTION
-            if uv > .7*vmax and self.gain > 0:
-                while uv > .7*vmax and self.gain > 1:
-                    self.gain -= 1
-                    self.sensor.set_gain(ltr390.GAINS[self.gain])
-                    time.sleep_ms(self.sensor._int_ms + 10)
-                    uv = self.sensor.read_uv()
-            else:
-                while uv < .1*vmax and self.gain < 4:
-                    self.gain += 1
-                    self.sensor.set_gain(ltr390.GAINS[self.gain])
-                    time.sleep_ms(self.sensor._int_ms + 10)
-                    uv = self.sensor.read_uv()
-            time.sleep_ms(self.sensor._int_ms + 10)
+            # uv = self.sensor.read_uv()
+            # vmax = 2**config.UV_RESOLUTION
+            # if uv > .7*vmax and self.gain > 0:
+            #     while uv > .7*vmax and self.gain > 1:
+            #         self.gain -= 1
+            #         self.sensor.set_gain(ltr390.GAINS[self.gain])
+            #         time.sleep_ms(self.sensor._int_ms + 10)
+            #         uv = self.sensor.read_uv()
+            # else:
+            #     while uv < .1*vmax and self.gain < 4:
+            #         self.gain += 1
+            #         self.sensor.set_gain(ltr390.GAINS[self.gain])
+            #         time.sleep_ms(self.sensor._int_ms + 10)
+            #         uv = self.sensor.read_uv()
+            # time.sleep_ms(self.sensor._int_ms + 10)
+            # return {
+            #     'kind' : SENSOR_LIGHT,
+            #     'uvindex': self.sensor.uv_index(uv)
             return {
                 'kind' : SENSOR_LIGHT,
-                'uvindex': self.sensor.uv_index(uv)
+                'uvindex': self.sensor.read_uv()
             }
-
+        
         if self.current_kind == SENSOR_SOLAR:
             v = self._adc()
             return {
@@ -238,11 +241,11 @@ class SensorManager:
             return {
                 'kind': SENSOR_MAGNET,
                 'rx': x,
-                'x': x - qx,
+                'B_x': x - qx,
                 'ry': y,
-                'y': y - qy,
+                'B_y': y - qy,
                 'rz': z,
-                'z': z - qz
+                'B_z': z - qz
             }
 
         return None

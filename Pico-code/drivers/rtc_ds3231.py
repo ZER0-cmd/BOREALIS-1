@@ -1,5 +1,5 @@
 class DS3231:
-    def __init__(self, i2c, address=0x68):
+    def __init__(self, i2c, address=0x3c):
         self.i2c = i2c
         self.address = address
 

@@ -128,11 +128,20 @@ class Ui:
     def show_calibrating(self, sensor):
         self.oled.fill(0)
         self.text_center(str(sensor), 0)
-        self.oled.text('CALIBRATING', 15)
-        self.oled.text('Do not move', 25)
+        self.oled.text('CALIBRATING', 0, 15)
+        self.oled.text('Do not move', 0, 25)
     
     def show_calibration_abort(self, msg):
         self.oled.fill(0)
         self.text_center('CALIBRATON', 0)
         self.text_center('FAILED', 10)
         self.text_center(str(msg), 25)
+    
+    def show_newfile(self,path):
+        self.oled.text('Created new file', 0, 15)
+        self.text_center(str(path), 25)
+    
+    def text(self, *args):
+        self.oled.text(*args)
+    def show(self):
+        self.oled.show()
