@@ -39,7 +39,7 @@ SENSOR_NAMES = {
 }
 
 class SensorManager:
-    def __init__(self):
+    def __init__(self, i2c_adc=None):
         self.adc = ADC(config.SENSOR_ID_ADC_PIN)
 
         self.i2c = I2C(
@@ -49,12 +49,15 @@ class SensorManager:
             freq=config.SENSOR_I2C_FREQ,
         )
 
-        self.i2c_adc = I2C(
-            config.ADC_I2C_ID,
-            sda=Pin(config.ADC_I2C_SDA),
-            scl=Pin(config.ADC_I2C_SCL),
-            freq=config.ADC_I2C_FREQ,
-        )
+        if i2c_adc is not None:
+            self.i2c_adc = i2c_adc
+        else:
+            self.i2c_adc = I2C(
+                config.ADC_I2C_ID,
+                sda=Pin(config.ADC_I2C_SDA),
+                scl=Pin(config.ADC_I2C_SCL),
+                freq=config.ADC_I2C_FREQ,
+            )
 
         self.current_kind = None
         self.sensor = None
@@ -133,20 +136,23 @@ class SensorManager:
             self.sensor = None
 
     def refresh_connection(self):
-        adc_value = self.read_adc()
-        kind = self.classify(adc_value)
-        
-        if kind == self._pending:
-            self._pcount += 1
-        else:
-            self._pending = kind
-            self._pcount = 1
+        try:
+            adc_value = self.read_adc()
+            kind = self.classify(adc_value)
+            
+            if kind == self._pending:
+                self._pcount += 1
+            else:
+                self._pending = kind
+                self._pcount = 1
 
-        if self._pcount >= 8 and kind != self.current_kind:
-            self.connect_for_kind(kind)
-            return True, kind, adc_value
+            if self._pcount >= 8 and kind != self.current_kind:
+                self.connect_for_kind(kind)
+                return True, kind, adc_value
 
-        return False, kind, adc_value
+            return False, kind, adc_value
+        except Exception:
+            return False, self.current_kind, 0
 
     def read_data(self):
         if self.current_kind == SENSOR_NONE:

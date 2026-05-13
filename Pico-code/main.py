@@ -12,6 +12,6 @@ def loop():
     data = main.read_sensor()
     if data != None:
         print(data)
-    main.log_data(data)
+        main.log_data(data)
 
 main.run(setup, loop)

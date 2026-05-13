@@ -1,12 +1,10 @@
-# app/controller.py
-
 import time
 from machine import Pin, I2C, SPI, reset
 import config
 from drivers.display_ssd1306 import SSD1306_I2C
 from drivers.output_led import LED
 from drivers.sd_detect import SdDetect
-from drivers.rtc_ds3231 import DS3231
+from drivers.rtc_ds1302 import DS1302
 from app.ui import Ui
 from app import logging
 from app.sensor_manager import (
@@ -53,11 +51,12 @@ class core:
             active_low=config.SD_DETECT_ACTIVE_LOW,
         )
         self.sd = None
-        self.sensor_manager = SensorManager()
+        self.sensor_manager = SensorManager(i2c_adc=self.i2c)
         self.last_sensor_read_ms = 0
         self.log_ready = False
         self.data = {}
         self.datakeys = []
+        self.ui = None
 
         # Synchronisation: flag to signal fresh sensor data
         self._new_data_available = False
@@ -68,7 +67,11 @@ class core:
         self.start_epoch = None
         self.rtc = None
         try:
-            self.rtc = DS3231(self.i2c)
+            self.rtc = DS1302(
+                Pin(config.DS1302_CLK),
+                Pin(config.DS1302_DAT),
+                Pin(config.DS1302_CE),
+            )
             dt = self.rtc.datetime()
             self.start_epoch = self._dt_to_epoch(dt)
             self.rtc_ok = True
@@ -144,8 +147,9 @@ class core:
     # ------------------------------------------------------------------
 
     def oledmanager(self):
+        if self.ui is not None:
+            self.oled = self.ui.oled
         if self.oled is not None:
-            self.ui = Ui(self.oled)
             return
         if config.OLED_I2C_ADDR in self.i2c.scan():
             try:
@@ -159,6 +163,7 @@ class core:
                 print("OLED init failed:", e)
                 self.oled = None
         self.ui = Ui(self.oled)
+        self.oled = self.ui.oled
 
     def experimentmanager(self):
         self.changed, kind, adc_value = self.sensor_manager.refresh_connection()
@@ -184,7 +189,6 @@ class core:
                 self.ui.show_sensor_disconnected()
                 self._new_data_available = False
                 return
-
             if self.data["kind"] == SENSOR_HUMIDITY:
                 sensor_keys = ["humidity_percent"]
                 show = self.ui.show_humidity_data
@@ -335,12 +339,14 @@ class library(core):
             self.experimentmanager()  # also updates the flag
 
         # Consume the fresh data
-        self._new_data_available = False
-        if self.data is not None:
-            if self.cscale is not None or self.cshift is not None:
-                return [self.data[k] * self.cscale[k] + self.cshift[k] for k in filter]
-            return [self.data[k] for k in filter]
-        return None
+        try:
+            self._new_data_available = False
+            if self.data is not None:
+                if self.cscale is not None or self.cshift is not None:
+                    return [self.data[k] * self.cscale[k] + self.cshift[k] for k in filter]
+                return [self.data[k] for k in filter]
+        except Exception:
+            return None
 
     # ------------------------------------------------------------------
     # Main run loop

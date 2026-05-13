@@ -1,15 +1,17 @@
 def guard(method):
     def wrapped(self, *args, **kwargs):
-        if self.oled is None:
+        try:
+            return method(self, *args, **kwargs)
+        except Exception:
+            self.oled = None
             return None
-        return method(self, *args, **kwargs)
     return wrapped
 
 def applyguard(cls):
     for attr_name in dir(cls):
+        attr = getattr(cls, attr_name)
         if attr_name.startswith('_'):
             continue
-        attr = getattr(cls, attr_name)
         if callable(attr):
             setattr(cls, attr_name, guard(attr))
     return cls
@@ -137,10 +139,15 @@ class Ui:
         self.text_center('FAILED', 10)
         self.text_center(str(msg), 25)
     
-    def show_newfile(self,path):
+    def show_newfile(self, path):
+        self.oled.fill(0)
         self.oled.text('Created new file', 0, 15)
         self.text_center(str(path), 25)
     
+    def clear(self):
+        self.oled.fill(0)
+        self.oled.show()
+
     def text(self, *args):
         self.oled.text(*args)
     def show(self):
