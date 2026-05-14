@@ -114,12 +114,12 @@ class SensorManager:
                 raise RuntimeError("MPU6500 not found")
             
             if kind == SENSOR_LIGHT:
+                # note: als mode exclusive with uv
                 self.sensor = ltr390.LTR390(self.i2c)
                 self.gain = 1
                 self.sensor.set_gain(ltr390.GAINS[self.gain])
                 self.sensor.set_resolution(config.UV_RESOLUTION)
                 self.sensor.enable_uv()
-                self.sensor.enable_als()
                 time.sleep_ms(self.sensor._int_ms + 10)
                 return
             
@@ -232,7 +232,7 @@ class SensorManager:
             #     'uvindex': self.sensor.uv_index(uv)
             return {
                 'kind' : SENSOR_LIGHT,
-                'uvindex': self.sensor.read_uv()
+                'uvindex': self.sensor.uv_index()
             }
         
         if self.current_kind == SENSOR_SOLAR:
