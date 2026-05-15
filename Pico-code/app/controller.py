@@ -56,10 +56,11 @@ class core:
         self.log_ready = False
         self.data = {}
         self.datakeys = []
+        self.sensorkeys = []
         self.ui = None
 
         # Synchronisation: flag to signal fresh sensor data
-        self._new_data_available = False
+        self.dataready = False
 
         # --- RTC / elapsed-time setup -----------------------------------
         self.start_ticks_ms = time.ticks_ms()
@@ -187,44 +188,55 @@ class core:
             self.data = self.sensor_manager.read_data()
             if self.data is None:
                 self.ui.show_sensor_disconnected()
-                self._new_data_available = False
+                self.dataready = False
                 return
             if self.data["kind"] == SENSOR_HUMIDITY:
-                sensor_keys = ["humidity_percent"]
+                self.sensorkeys = ["humidity_percent"]
                 show = self.ui.show_humidity_data
             elif self.data["kind"] == SENSOR_PRESSURE:
-                sensor_keys = ["pressure_hpa"]
+                self.sensorkeys = ["pressure_hpa"]
                 show = self.ui.show_pressure_data
             elif self.data["kind"] == SENSOR_MPU6500:
-                sensor_keys = ["ax_g", "ay_g", "az_g", "gx_dps", "gy_dps", "gz_dps"]
+                self.sensorkeys = ["ax_g", "ay_g", "az_g", "gx_dps", "gy_dps", "gz_dps"]
                 show = self.ui.show_mpu6500_data
             elif self.data["kind"] == SENSOR_SOLAR:
-                sensor_keys = ["voltage"]
+                self.sensorkeys = ["voltage"]
                 show = self.ui.show_solar_data
             elif self.data["kind"] == SENSOR_TEMP:
-                sensor_keys = ["temperature_c"]
+                self.sensorkeys = ["temperature_c"]
                 show = self.ui.show_temp_data
             elif self.data["kind"] == SENSOR_GAS:
-                sensor_keys = ["alcohol"]
+                self.sensorkeys = ["alcohol"]
                 show = self.ui.show_gas_data
             elif self.data["kind"] == SENSOR_LIGHT:
-                sensor_keys = ["uvindex"]
+                self.sensorkeys = ["uvindex"]
                 show = self.ui.show_light_data
             elif self.data["kind"] == SENSOR_MAGNET:
-                sensor_keys = ["B_x", "B_y", "B_z"]
+                self.sensorkeys = ["B_x", "B_y", "B_z"]
                 show = self.ui.show_magnet_data
             else:
                 self.ui.show_unknown_sensor(self.data["adc"])
-                self._new_data_available = False
+                self.dataready = False
                 return
 
             self.data["elapsed_s"] = self._elapsed_s()
-            self.datakeys = ["elapsed_s"] + sensor_keys
+            self.datakeys = ["elapsed_s"] + self.sensorkeys
+            if self.filter is None or set(self.filter).issubset(set(self.sensorkeys)):
+                self.filter = self.sensorkeys
 
-            show(*(self.data[k] for k in sensor_keys))
+            if self.cdata is not None:
+                kind = self.data["kind"]
+                if kind in self.cdata:
+                    c = self.cdata[kind]
+                    for k, (scale, shift) in c.items():
+                        if k in self.data:
+                            self.data[k] = self.data[k] * scale + shift
+
+            show(*(self.data[k] for k in self.sensorkeys))
 
             # Mark fresh data as available – only reset when consumed
-            self._new_data_available = True
+            self.dataready = True
+            
 
     def sdmanager(self):
         self.inserted = self.sd_detect.is_inserted()
@@ -275,8 +287,7 @@ class library(core):
     def __init__(self):
         core.__init__(self)
         self.file = None
-        self.cshift = None
-        self.cscale = None
+        self.cdata = {}
         self.filter = None
 
         # Button state machine (double‑click / long‑press)
@@ -323,30 +334,21 @@ class library(core):
     # Blocking sensor read – waits for fresh hardware sample
     # ------------------------------------------------------------------
 
-    def read_sensor(self, filter=None):
+    def read_sensor(self):
         """
         Return the most recent sensor data as a list.
         Blocks until a new sample has been taken by experimentmanager().
         """
-        self.filter = filter
-        if filter is None:
-            filter = self.datakeys
-        filter = list(filter)
-
+        keys = ["elapsed_s"] + self.filter
         # Wait until experimentmanager has set new_data_available
-        while not self._new_data_available:
-            time.sleep_ms(5)          # yield to background tasks
-            self.experimentmanager()  # also updates the flag
+        if not self.dataready:
+            return
 
-        # Consume the fresh data
-        try:
-            self._new_data_available = False
-            if self.data is not None:
-                if self.cscale is not None or self.cshift is not None:
-                    return [self.data[k] * self.cscale[k] + self.cshift[k] for k in filter]
-                return [self.data[k] for k in filter]
-        except Exception:
-            return None
+        # Consume the fresh data (calibration already applied to self.data)
+        self.dataready = False
+        if self.data is not None:
+            return [self.data[k] for k in keys]
+                
 
     # ------------------------------------------------------------------
     # Main run loop
@@ -364,9 +366,9 @@ class library(core):
             self.resetmanager()
             self.oledmanager()
             self.statusmanager()
-            self.experimentmanager()   # may set _new_data_available
+            self.experimentmanager()
             self.sdmanager()
-            loop()                     # user code calls read_sensor() + logging
+            loop()
 
     # ------------------------------------------------------------------
     # File helpers
@@ -406,42 +408,70 @@ class library(core):
     # Calibration (unchanged, but safe against None OLED through ui)
     # ------------------------------------------------------------------
 
-    def calibrate(self, value, value2=None, le=50):
-        if self.data is None or self.data["kind"] == SENSOR_UNKNOWN:
-            self.ui.show_calibration_abort("Cannot calibrate\nsensor")
-            return
-        filter = self.filter if self.filter is not None else self.datakeys
-        filter = list(filter)
+    def calibrate(self, value, value2=None, le=1):
+        print("Calibration Started")
 
-        def collect(le):
-            acc = [0.0] * len(filter)
-            for i in range(le):
-                data = self.sensor_manager.read_data()
-                if data is None:
+        for _ in range(10):
+            self.experimentmanager()
+            if self.data is None or self.data.get("kind") == SENSOR_UNKNOWN:
+                continue
+            break
+
+        if not isinstance(value, dict):
+            raise TypeError("value must be a dict")
+        
+        keys = list(value.keys())
+
+        if value2 is not None:
+            if not isinstance(value2, dict):
+                raise TypeError("value2 must be a dict")
+
+            if set(value2.keys()) != set(keys):
+                raise ValueError("value and value2 must contain the same keys")
+
+        def collect(n):
+            acc = {k: 0.0 for k in keys}
+            count = 0
+
+            for _ in range(n):
+                self.experimentmanager()
+                if self.data is None:
                     continue
-                for j, k in enumerate(filter):
-                    acc[j] += data[k]
-            return [a / le for a in acc]
+
+                for k in keys:
+                    if k in self.data:
+                        acc[k] += self.data[k]
+                count += 1
+
+            if count == 0:
+                print("No valid sensor data collected during calibration")
+                return
+
+            return {k: acc[k] / count for k in keys}
 
         try:
             acc1 = collect(le)
             if value2 is not None:
-                input("Change to value2. Then hit any button")
+                input("Change to value2. Then hit any key")
                 acc2 = collect(le)
-                v1_list = list(value)  if hasattr(value,  "__iter__") else [value]
-                v2_list = list(value2) if hasattr(value2, "__iter__") else [value2]
-                scales = [(v2 - v1) / (a2 - a1)
-                          for v1, v2, a1, a2 in zip(v1_list, v2_list, acc1, acc2)]
-                shifts = [v1 - a1 * s
-                          for v1, a1, s in zip(v1_list, acc1, scales)]
+                cdata = {}
+                for k in keys:
+                    v1 = value[k]
+                    v2 = value2[k]
+                    a1 = acc1[k]
+                    a2 = acc2[k]
+                    if a2 == a1:
+                        raise ZeroDivisionError(f"Calibration failed for '{k}': no change in measured value")
+                    scale = (v2 - v1) / (a2 - a1)
+                    shift = v1 - a1 * scale
+                    cdata[k] = (scale, shift)
             else:
-                v_list = list(value) if hasattr(value, "__iter__") else [value]
-                scales = [1.0] * len(filter)
-                shifts = [v - a for v, a in zip(v_list, acc1)]
-            self.cscale = dict(zip(filter, scales))
-            self.cshift = dict(zip(filter, shifts))
+                cdata = {k: (1.0, value[k] - acc1[k]) for k in keys}
         except Exception as e:
             print("Calibration failed:", e)
+        
+        self.cdata[self.data['kind']] = cdata
+        print(f"Calibration success: {cdata}")
 
     def write_oled(self, msg):
         self.clear_oled()

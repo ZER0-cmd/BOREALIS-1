@@ -1,17 +1,16 @@
 from app.controller import library
 from machine import Pin
 import time
-main = library()
+apex = library()
 
 def setup():
-    # while not main.log_ready:
-    main.newfile('data.csv')
-    main.log_headers()
+    apex.newfile('data.csv')
+    apex.log_headers()
+    apex.calibrate({'pressure_hpa': 0})
 
 def loop():
-    data = main.read_sensor()
+    data = apex.read_sensor()
     if data != None:
         print(data)
-        main.log_data(data)
 
-main.run(setup, loop)
+apex.run(setup, loop)
