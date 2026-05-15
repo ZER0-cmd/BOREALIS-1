@@ -408,7 +408,7 @@ class library(core):
     # Calibration (unchanged, but safe against None OLED through ui)
     # ------------------------------------------------------------------
 
-    def calibrate(self, value, value2=None, le=1):
+    def calibrate(self, value, value2=None, le=10):
         print("Calibration Started")
 
         for _ in range(10):

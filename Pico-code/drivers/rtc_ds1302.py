@@ -43,6 +43,15 @@ class DS1302:
         self._clk.value(0)
         self._ce.value(0)
 
+        # Clear write-protect, then start oscillator if halted.
+        # On a fresh or battery-less chip, bit 7 of the seconds register
+        # (the Clock Halt / CH bit) powers up as 1, freezing the clock.
+        self._wp(False)
+        sec_reg = self._read_reg(_REG_SECOND)
+        if sec_reg & 0x80:
+            self._write_reg(_REG_SECOND, sec_reg & 0x7F)
+        self._wp(True)
+
     # ------------------------------------------------------------------
     # Low-level bit-bang
     # ------------------------------------------------------------------
