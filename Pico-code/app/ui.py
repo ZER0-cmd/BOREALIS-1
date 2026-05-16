@@ -87,30 +87,30 @@ class Ui:
     def show_mpu6500_data(self, ax, ay, az, gx, gy, gz):
         self.oled.fill(0)
         self.text_center("MPU6500", 0)
-        self.oled.text("A X%.2f Y%.2f" % (ax, ay), 0, 15)
-        self.oled.text("A Z%.2f g" % az, 0, 25)
+        self.oled.text("A X%.2E Y%.2E" % (ax, ay), 0, 15)
+        self.oled.text("A Z%.2E g" % az, 0, 25)
         self.oled.text("G X%.0f Y%.0f" % (gx, gy), 0, 35)
         self.oled.text("G Z%.0f dps" % gz, 0, 45)
 
     def show_temp_data(self, temp):
         self.oled.fill(0)
         self.text_center("Temperature", 0)
-        self.oled.text("Temp: %.2f C" % temp, 0, 15)
+        self.oled.text("Temp: %.2E C" % temp, 0, 15)
     
     def show_solar_data(self, v):
         self.oled.fill(0)
         self.text_center("Solar", 0)
-        self.oled.text("Voltage: %.2f V" % v, 0, 15)
+        self.oled.text("Voltage: %.2E V" % v, 0, 15)
     
     def show_light_data(self, uv):
         self.oled.fill(0)
         self.text_center("UV", 0)
-        self.oled.text("UV-index: %.1f" % uv, 0, 15)
+        self.oled.text("UV-index: %.2E" % uv, 0, 15)
     
     def show_gas_data(self, v):
         self.oled.fill(0)
         self.text_center("MQ-Sensor", 0)
-        self.oled.text("Presence: %.2f" % v, 0, 15)
+        self.oled.text("Presence: %.2E" % v, 0, 15)
         
     def show_magnet_data(self,x,y,z):
         self.oled.fill(0)

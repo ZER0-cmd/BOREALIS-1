@@ -4,7 +4,7 @@ import config
 from drivers.display_ssd1306 import SSD1306_I2C
 from drivers.output_led import LED
 from drivers.sd_detect import SdDetect
-from drivers.rtc_ds1302 import DS1302
+from app.timekeeping import Timekeeper
 from app.ui import Ui
 from app import logging
 from app.sensor_manager import (
@@ -23,7 +23,7 @@ from app.sensor_manager import (
 )
 
 
-class core:
+class Core(Timekeeper):
     def __init__(self):
         self.green_led = LED(
             config.LED_GREEN,
@@ -58,58 +58,11 @@ class core:
         self.datakeys = []
         self.sensorkeys = []
         self.ui = None
+        self.filter = []
 
-        # Synchronisation: flag to signal fresh sensor data
         self.dataready = False
 
-        # --- RTC / elapsed-time setup -----------------------------------
-        self.start_ticks_ms = time.ticks_ms()
-        self.rtc_ok = False
-        self.start_epoch = None
-        self.rtc = None
-        try:
-            self.rtc = DS1302(
-                Pin(config.DS1302_CLK),
-                Pin(config.DS1302_DAT),
-                Pin(config.DS1302_CE),
-            )
-            dt = self.rtc.datetime()
-            self.start_epoch = self._dt_to_epoch(dt)
-            self.rtc_ok = True
-        except Exception as e:
-            print("RTC init failed:", e)
-
-    # ------------------------------------------------------------------
-    # Time helpers
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def _dt_to_epoch(dt):
-        year, month, day, weekday, hour, minute, sec, _ = dt
-        return time.mktime((year, month, day, hour, minute, sec,
-                            (weekday - 1) % 7, 0))
-
-    def _elapsed_s(self):
-        ticks_now = time.ticks_ms()
-        uptime_s = time.ticks_diff(ticks_now, self.start_ticks_ms) / 1000.0
-
-        if self.rtc_ok:
-            try:
-                now_epoch = self._dt_to_epoch(self.rtc.datetime())
-                rtc_elapsed = now_epoch - self.start_epoch
-                if uptime_s > 10 and rtc_elapsed < 1.0:
-                    self.rtc_ok = False
-                    return uptime_s
-                return rtc_elapsed
-            except Exception as e:
-                print("RTC read failed:", e)
-                self.rtc_ok = False
-
-        return uptime_s
-
-    # ------------------------------------------------------------------
-    # Startup
-    # ------------------------------------------------------------------
+        Timekeeper.__init__(self)
 
     def _run_startup_checks(self):
         start_ms = time.ticks_ms()
@@ -143,11 +96,7 @@ class core:
         else:
             self.status_led.off()
 
-    # ------------------------------------------------------------------
-    # Managers
-    # ------------------------------------------------------------------
-
-    def oledmanager(self):
+    def _oledmanager(self):
         if self.ui is not None:
             self.oled = self.ui.oled
         if self.oled is not None:
@@ -166,7 +115,7 @@ class core:
         self.ui = Ui(self.oled)
         self.oled = self.ui.oled
 
-    def experimentmanager(self):
+    def _experimentmanager(self):
         self.changed, kind, adc_value = self.sensor_manager.refresh_connection()
         if self.changed:
             if kind == SENSOR_NONE:
@@ -219,9 +168,10 @@ class core:
                 self.dataready = False
                 return
 
-            self.data["elapsed_s"] = self._elapsed_s()
-            self.datakeys = ["elapsed_s"] + self.sensorkeys
-            if self.filter is None or set(self.filter).issubset(set(self.sensorkeys)):
+            self.data["elapsed_s"] = self.elapsed_s()
+            self.data['datetime'] = self.fdate()
+            self.datakeys = ['datetime', "elapsed_s"] + self.sensorkeys
+            if self.filter == [] or set(self.filter).issubset(set(self.sensorkeys)):
                 self.filter = self.sensorkeys
 
             if self.cdata is not None:
@@ -238,7 +188,7 @@ class core:
             self.dataready = True
             
 
-    def sdmanager(self):
+    def _sdmanager(self):
         self.inserted = self.sd_detect.is_inserted()
         if self.inserted and (self.changed or self.sd is None):
             try:
@@ -270,7 +220,7 @@ class core:
         self.ui.show()
         time.sleep_ms(100)
 
-    def statusmanager(self):
+    def _statusmanager(self):
         if self.log_ready:
             self.green_led.on()
         else:
@@ -283,24 +233,35 @@ class core:
             self.green_led.on(0.65)
 
 
-class library(core):
+class Library(Core):
+    """
+    Manages the core runtime environment for experiments, handling sensor data 
+    collection, data logging to SD cards, OLED display updates, user input 
+    button management, and sensor calibration.
+    """
     def __init__(self):
-        core.__init__(self)
+        """
+        Initializes the Library instance, setting up internal states for data 
+        storage and button-debounce tracking.
+        """
+        Core.__init__(self)
         self.file = None
         self.cdata = {}
-        self.filter = None
 
-        # Button state machine (double‑click / long‑press)
+        # Button debounce and state tracking variables
         self._btn_last_state = False
         self._btn_last_change = 0
         self._btn_press_start = 0
         self._btn_last_release = None
 
-    # ------------------------------------------------------------------
-    # Reset / file‑creation manager
-    # ------------------------------------------------------------------
-
-    def resetmanager(self):
+    def _resetmanager(self):
+        """
+        Monitors the system reset buttons to trigger system events. 
+        
+        Implements software debouncing. Handles two main interactions:
+        1. Double-click: Creates a new default data log file.
+        2. Long-press (>= 2 seconds): Triggers a hard system reset.
+        """
         now = time.ticks_ms()
         pressed = self.reset1.value() or self.reset2.value()
 
@@ -318,6 +279,7 @@ class library(core):
                         self.ui.show_newfile(config.DEFAULT_FILE_NAME)
                         self.ui.show()
                         self.newfile(config.DEFAULT_FILE_NAME)
+                        time.sleep(0.5)
                     self._btn_last_release = None
                 return
             else:
@@ -330,59 +292,92 @@ class library(core):
             time.sleep(0.5)
             reset()
 
-    # ------------------------------------------------------------------
-    # Blocking sensor read – waits for fresh hardware sample
-    # ------------------------------------------------------------------
-
     def read_sensor(self):
         """
         Return the most recent sensor data as a list.
-        Blocks until a new sample has been taken by experimentmanager().
+        Blocks until a new sample has been taken by _experimentmanager().
+
+        Returns:
+            list: A list containing timestamps, elapsed seconds, and filtered 
+                  sensor readings. Returns None if data is not ready.
         """
-        keys = ["elapsed_s"] + self.filter
-        # Wait until experimentmanager has set new_data_available
+        keys = ['datetime', "elapsed_s"] + self.filter
+
         if not self.dataready:
             return
 
-        # Consume the fresh data (calibration already applied to self.data)
         self.dataready = False
         if self.data is not None:
             return [self.data[k] for k in keys]
                 
-
-    # ------------------------------------------------------------------
-    # Main run loop
-    # ------------------------------------------------------------------
-
     def run(self, setup, loop):
-        self.oledmanager()
+        """
+        Starts the main program loop. Handles device initialization, boot animations, 
+        startup self-checks, and continuous background manager updates.
+
+        Args:
+            setup (function): User-defined function run once at startup.
+            loop (function): User-defined function executed repeatedly inside the main loop.
+        """
+        self._oledmanager()
         self.ui.show_boot()
         self.ui.show()
         system_ok = self._run_startup_checks()
         self._show_check_result(system_ok)
-        self.experimentmanager()
+        self._experimentmanager()
         setup()
         while True:
-            self.resetmanager()
-            self.oledmanager()
-            self.statusmanager()
-            self.experimentmanager()
-            self.sdmanager()
+            self._resetmanager()
+            self._oledmanager()
+            self._statusmanager()
+            self._experimentmanager()
+            self._sdmanager()
             loop()
 
-    # ------------------------------------------------------------------
-    # File helpers
-    # ------------------------------------------------------------------
-
     def newfile(self, path=config.DEFAULT_FILE_NAME):
-        if self.log_ready:
-            self.file = logging.newfile(self.sd, path)
+        """
+        Attempts to create a new log file on the SD card. Retries up to 20 times 
+        while waiting for the SD card logging system to become ready.
+
+        Args:
+            path (str): The destination file path. Defaults to config.DEFAULT_FILE_NAME.
+        """
+        for i in range(20):
+            if self.log_ready:
+                self.file = logging.newfile(self.sd, path)
+                self.write_oled('FILE CREATED')
+                print(f'File created: {path}')
+                time.sleep(0.5)
+                return
+            self._sdmanager()
+        print('File creation failed')
 
     def loadfile(self, path):
-        if self.log_ready:
-            self.file = logging.loadfile(self.sd, path)
+        """
+        Attempts to load an existing file from the SD card. Retries up to 20 times
+        while waiting for the logging system to become ready.
+
+        Args:
+            path (str): The path of the file to load.
+        """
+        for i in range(20):
+            if self.log_ready:
+                self.file = logging.loadfile(self.sd, path)
+                self.write_oled('FILE LOADED')
+                print(f'File loaded: {path}')
+                time.sleep(0.5)
+                return
+            self._sdmanager()
+        print('Loading file failed')
 
     def log_data(self, data):
+        """
+        Writes a single row of data to the currently open log file. Retries up to 
+        20 times with a 50ms delay if an exception occurs during the write attempt.
+
+        Args:
+            data (list/tuple): The row data to be written into the log file.
+        """
         if self.file is not None and self.log_ready:
             for i in range(20):
                 try:
@@ -393,9 +388,20 @@ class library(core):
                     time.sleep_ms(50)
 
     def log_headers(self, headers=None):
+        """
+        Writes CSV headers to the active log file. Automatically extracts 
+        headers from `self.datakeys` if none are provided.
+
+        Args:
+            headers (list, optional): List of strings representing header names. 
+                                      Defaults to None.
+        """
         if self.file is not None and self.log_ready:
             for i in range(20):
                 try:
+                    if self.datakeys == []:
+                        self._experimentmanager()
+                        continue
                     if headers is None:
                         headers = self.datakeys
                     self.file.write_headers(headers)
@@ -404,15 +410,24 @@ class library(core):
                     print(e)
                     time.sleep_ms(50)
 
-    # ------------------------------------------------------------------
-    # Calibration (unchanged, but safe against None OLED through ui)
-    # ------------------------------------------------------------------
-
     def calibrate(self, value, value2=None, le=10):
-        print("Calibration Started")
+        """
+        Performs either a 1-point offset calibration or a 2-point linear 
+        (scale and shift) calibration for connected sensors.
+
+        Calculates calibration coefficients and maps them to the recognized 
+        sensor type in `self.cdata`.
+
+        Args:
+            value (dict): Dictionary mapping data keys to target calibration values.
+            value2 (dict, optional): Second set of target calibration values for 
+                                     2-point calibration. Defaults to None.
+            le (int): Number of valid sensor readings to average per point. Defaults to 10.
+        """
+        input("Calibration Started. Hit any key to continue")
 
         for _ in range(10):
-            self.experimentmanager()
+            self._experimentmanager()
             if self.data is None or self.data.get("kind") == SENSOR_UNKNOWN:
                 continue
             break
@@ -434,7 +449,7 @@ class library(core):
             count = 0
 
             for _ in range(n):
-                self.experimentmanager()
+                self._experimentmanager()
                 if self.data is None:
                     continue
 
@@ -474,8 +489,33 @@ class library(core):
         print(f"Calibration success: {cdata}")
 
     def write_oled(self, msg):
+        """
+        Clears the OLED screen and prints a new string centered on the panel.
+
+        Args:
+            msg (any): The message object to be cast to a string and displayed.
+        """
         self.clear_oled()
         self.ui.text_center(str(msg), 28)
+        self.ui.show()
 
     def clear_oled(self):
+        """
+        Clears all current content displayed on the OLED screen.
+        """
         self.ui.clear()
+    
+    def led(self, set):
+        """
+        Turns the physical hardware status LED on or off.
+
+        Args:
+            set : Set to 1 or True to turn the LED on, False or 0 to turn it off.
+
+        """
+        if set == True:
+            self.status_led.on()
+        elif set == False:
+            self.status_led.off()
+        else:
+            raise TypeError('Invalid LED value')
