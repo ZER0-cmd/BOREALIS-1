@@ -1,9 +1,8 @@
-# csv_to_py.py
-import csv, os, glob
+import csv, os, glob, sys
 
-os.makedirs("Pico-code/pictures", exist_ok=True)
+os.makedirs(sys.argv[1], exist_ok=True)
 
-for csv_path in glob.glob("pictures/*.csv"):
+for csv_path in glob.glob(f"{sys.argv[2]}/*.csv"):
     name = os.path.splitext(os.path.basename(csv_path))[0]
     pixels = []
     dim = (0, 0)
@@ -18,7 +17,7 @@ for csv_path in glob.glob("pictures/*.csv"):
                 pixels.append(int(row[1]))
                 pixels.append(int(row[2]))
 
-    with open(f"Pico-code/pictures/{name.replace(' ', '')}.py", "w") as f:
+    with open(f"{sys.argv[1]}/{name.replace(' ', '')}.py", "w") as f:
         f.write(f"DIM = {dim}\n")
         f.write(f"PIXELS = bytes({pixels})\n")
 
