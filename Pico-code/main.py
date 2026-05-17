@@ -6,7 +6,6 @@ apex = Library()
 def setup():
     apex.newfile('data.csv')
     apex.log_headers()
-    # apex.calibrate({'pressure_hpa': 0})
 
 def loop():
     data = apex.read_sensor()

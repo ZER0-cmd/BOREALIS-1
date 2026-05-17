@@ -131,6 +131,8 @@ class Core(Timekeeper):
                 self.ui.show()
                 time.sleep_ms(config.SENSOR_ANNOUNCE_MS)
 
+            self.filter = []
+
         now = time.ticks_ms()
         if time.ticks_diff(now, self.last_sensor_read_ms) >= config.SENSOR_READ_INTERVAL_MS:
             self.last_sensor_read_ms = now
@@ -171,7 +173,7 @@ class Core(Timekeeper):
             self.data["elapsed_s"] = self.elapsed_s()
             self.data['datetime'] = self.fdate()
             self.datakeys = ['datetime', "elapsed_s"] + self.sensorkeys
-            if self.filter == [] or set(self.filter).issubset(set(self.sensorkeys)):
+            if self.filter == []:
                 self.filter = self.sensorkeys
 
             if self.cdata is not None:
@@ -334,7 +336,7 @@ class Library(Core):
             self._sdmanager()
             loop()
 
-    def newfile(self, path=config.DEFAULT_FILE_NAME):
+    def newfile(self, path=None):
         """
         Attempts to create a new log file on the SD card. Retries up to 20 times 
         while waiting for the SD card logging system to become ready.
@@ -342,11 +344,13 @@ class Library(Core):
         Args:
             path (str): The destination file path. Defaults to config.DEFAULT_FILE_NAME.
         """
+        if path is None:
+            path = config.DEFAULT_FILE_NAME
         for i in range(20):
             if self.log_ready:
                 self.file = logging.newfile(self.sd, path)
                 self.write_oled('FILE CREATED')
-                print(f'File created: {path}')
+                print(f'File created: {self.file.path}')
                 time.sleep(0.5)
                 return
             self._sdmanager()
@@ -364,7 +368,7 @@ class Library(Core):
             if self.log_ready:
                 self.file = logging.loadfile(self.sd, path)
                 self.write_oled('FILE LOADED')
-                print(f'File loaded: {path}')
+                print(f'File loaded: {self.file.path}')
                 time.sleep(0.5)
                 return
             self._sdmanager()
@@ -510,7 +514,7 @@ class Library(Core):
         Turns the physical hardware status LED on or off.
 
         Args:
-            set : Set to 1 or True to turn the LED on, False or 0 to turn it off.
+            set : Set to 1 or True to turn the LED on, 0 or False to turn it off.
 
         """
         if set == True:
@@ -519,3 +523,11 @@ class Library(Core):
             self.status_led.off()
         else:
             raise TypeError('Invalid LED value')
+        
+    def sensor_name(self):
+        '''
+        Returns the name of the attached sensorboard.
+        '''
+        if self.data is None:
+            return
+        return SENSOR_NAMES[self.data['kind']]

@@ -69,8 +69,9 @@ class SensorManager:
     
     def _adc(self): # Actual ADC
         return self.sensor.read_voltage(config.ADC_CHANNEL)
-
-    def classify(self, adc_value):
+    
+    @staticmethod
+    def classify(adc_value):
         closest = min([SENSOR_NONE, SENSOR_GAS, SENSOR_HUMIDITY, SENSOR_LIGHT, SENSOR_MPU6500, SENSOR_PRESSURE, SENSOR_SOLAR, SENSOR_TEMP, SENSOR_CO2, SENSOR_MAGNET], key=lambda x : abs(x-adc_value))
         if abs(adc_value - closest) > 3000:
             return SENSOR_UNKNOWN
@@ -157,101 +158,103 @@ class SensorManager:
     def read_data(self):
         if self.current_kind == SENSOR_NONE:
             return None
-
+        
         if self.current_kind == SENSOR_UNKNOWN:
             return {
                 "kind": SENSOR_UNKNOWN,
                 "adc": self.read_adc(),
             }
 
-        if self.current_kind == SENSOR_HUMIDITY:
-            temp_c, humidity = self.sensor.read()
-            return {
-                "kind": SENSOR_HUMIDITY,
-                "temperature_c": temp_c,
-                "humidity_percent": humidity,
-            }
-
-        if self.current_kind == SENSOR_PRESSURE:
-            temp_c, pressure_pa = self.sensor.read()
-            return {
-                "kind": SENSOR_PRESSURE,
-                "pressure_hpa": pressure_pa / 100.0,
-                "temperature_c" : temp_c
-            }
-
-        if self.current_kind == SENSOR_MPU6500:
-            ax, ay, az = self.sensor.read_accel()
-            gx, gy, gz = self.sensor.read_gyro()
-            temp_c = self.sensor.read_temperature()
-
-            return {
-                "kind": SENSOR_MPU6500,
-                "temperature_c": temp_c,
-                "ax_g": ax,
-                "ay_g": ay,
-                "az_g": az,
-                "gx_dps": gx,
-                "gy_dps": gy,
-                "gz_dps": gz,
-            }
-        
-        if self.current_kind == SENSOR_TEMP:
-            v = self._adc()
-            temp = (v - 1.25) / 0.005
-            return {
-                "kind" : SENSOR_TEMP,
-                "temperature_c" : temp
+        try:
+            if self.current_kind == SENSOR_HUMIDITY:
+                temp_c, humidity = self.sensor.read()
+                return {
+                    "kind": SENSOR_HUMIDITY,
+                    "temperature_c": temp_c,
+                    "humidity_percent": humidity,
                 }
 
-        if self.current_kind == SENSOR_GAS:
-            v = self._adc()
-            return {'kind': SENSOR_GAS,
-                    'alcohol': 1.5*v}
+            if self.current_kind == SENSOR_PRESSURE:
+                temp_c, pressure_pa = self.sensor.read()
+                return {
+                    "kind": SENSOR_PRESSURE,
+                    "pressure_hpa": pressure_pa / 100.0,
+                    "temperature_c" : temp_c
+                }
+
+            if self.current_kind == SENSOR_MPU6500:
+                ax, ay, az = self.sensor.read_accel()
+                gx, gy, gz = self.sensor.read_gyro()
+                temp_c = self.sensor.read_temperature()
+
+                return {
+                    "kind": SENSOR_MPU6500,
+                    "temperature_c": temp_c,
+                    "ax_g": ax,
+                    "ay_g": ay,
+                    "az_g": az,
+                    "gx_dps": gx,
+                    "gy_dps": gy,
+                    "gz_dps": gz,
+                }
             
+            if self.current_kind == SENSOR_TEMP:
+                v = self._adc()
+                temp = (v - 1.25) / 0.005
+                return {
+                    "kind" : SENSOR_TEMP,
+                    "temperature_c" : temp
+                    }
 
-        if self.current_kind == SENSOR_LIGHT:
-            # Can read ambient light too using .read_als() but was to tired to do.
-            # uv = self.sensor.read_uv()
-            # vmax = 2**config.UV_RESOLUTION
-            # if uv > .7*vmax and self.gain > 0:
-            #     while uv > .7*vmax and self.gain > 1:
-            #         self.gain -= 1
-            #         self.sensor.set_gain(ltr390.GAINS[self.gain])
-            #         time.sleep_ms(self.sensor._int_ms + 10)
-            #         uv = self.sensor.read_uv()
-            # else:
-            #     while uv < .1*vmax and self.gain < 4:
-            #         self.gain += 1
-            #         self.sensor.set_gain(ltr390.GAINS[self.gain])
-            #         time.sleep_ms(self.sensor._int_ms + 10)
-            #         uv = self.sensor.read_uv()
-            # time.sleep_ms(self.sensor._int_ms + 10)
-            # return {
-            #     'kind' : SENSOR_LIGHT,
-            #     'uvindex': self.sensor.uv_index(uv)
-            return {
-                'kind' : SENSOR_LIGHT,
-                'uvindex': self.sensor.uv_index()
-            }
-        
-        if self.current_kind == SENSOR_SOLAR:
-            v = self._adc()
-            return {
-                "kind" : SENSOR_SOLAR,
-                "voltage" : v
+            if self.current_kind == SENSOR_GAS:
+                v = self._adc()
+                return {'kind': SENSOR_GAS,
+                        'alcohol': 1.5*v}
+                
+
+            if self.current_kind == SENSOR_LIGHT:
+                # Can read ambient light too using .read_als() but was to tired to do.
+                # uv = self.sensor.read_uv()
+                # vmax = 2**config.UV_RESOLUTION
+                # if uv > .7*vmax and self.gain > 0:
+                #     while uv > .7*vmax and self.gain > 1:
+                #         self.gain -= 1
+                #         self.sensor.set_gain(ltr390.GAINS[self.gain])
+                #         time.sleep_ms(self.sensor._int_ms + 10)
+                #         uv = self.sensor.read_uv()
+                # else:
+                #     while uv < .1*vmax and self.gain < 4:
+                #         self.gain += 1
+                #         self.sensor.set_gain(ltr390.GAINS[self.gain])
+                #         time.sleep_ms(self.sensor._int_ms + 10)
+                #         uv = self.sensor.read_uv()
+                # time.sleep_ms(self.sensor._int_ms + 10)
+                # return {
+                #     'kind' : SENSOR_LIGHT,
+                #     'uvindex': self.sensor.uv_index(uv)
+                return {
+                    'kind' : SENSOR_LIGHT,
+                    'uvindex': self.sensor.uv_index()
                 }
-        if self.current_kind == SENSOR_MAGNET:
-            x,y,z = self.sensor.read_raw()
-            qx,qy,qz = self.qcal
-            return {
-                'kind': SENSOR_MAGNET,
-                'rx': x,
-                'B_x': x - qx,
-                'ry': y,
-                'B_y': y - qy,
-                'rz': z,
-                'B_z': z - qz
-            }
-
+            
+            if self.current_kind == SENSOR_SOLAR:
+                v = self._adc()
+                return {
+                    "kind" : SENSOR_SOLAR,
+                    "voltage" : v
+                    }
+            if self.current_kind == SENSOR_MAGNET:
+                x,y,z = self.sensor.read_raw()
+                qx,qy,qz = self.qcal
+                return {
+                    'kind': SENSOR_MAGNET,
+                    'rx': x,
+                    'B_x': x - qx,
+                    'ry': y,
+                    'B_y': y - qy,
+                    'rz': z,
+                    'B_z': z - qz
+                }
+        except Exception:
+            pass
         return None
