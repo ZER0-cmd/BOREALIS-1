@@ -42,13 +42,13 @@ class loadfile():
         self._file.write(','.join(self._headers) + '\n')
         self._file.flush()
 
-    def write_row(self, *data) -> None:
+    def write_row(self, *data, safety=False) -> None:
         if not isinstance(data[0], str):
             data = data[0]
         if self._headers is None:
             self._headers = data
             self.write_headers(data)
-        if len(data) != len(self._headers):
+        if len(data) != len(self._headers) and safety:
             return
         data = [str(d) for d in data]
         self._file.write(','.join(data) + '\n')

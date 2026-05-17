@@ -18,9 +18,11 @@ def process(path, oleddim, invert=False):
     for x in range(ndims[0]):
         for y in range(ndims[1]):
             v = (0 if pixels[x,y] > 125 else 1) if invert else (1 if pixels[x,y] > 125 else 0)
+            if v == 0:
+                continue
             output.write(f'{x},{y},{v}\n')
 
 for i in 'gas', 'light', 'solar', 'temp':
-    process(f'Pictures/Internal/{i}.png', [128, 40])
+    process(f'Pictures/Internal/csv&{i}.png', [128, 40])
 
 # process('oledlogo.png', [128,64])
