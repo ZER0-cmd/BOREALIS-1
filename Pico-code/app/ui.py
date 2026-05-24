@@ -34,31 +34,27 @@ class Ui:
 
         self.oled.text(text, x, y)
 
-    def draw_image(self, path, x_offset=0, y_offset=0, center=False):
-        with open(path, "r") as file:
-            xdim = 0
-            ydim = 0
-            for p in file:
-                p = p.strip().split(",")
-                if len(p) != 3:
-                    if len(p) == 2:
-                        xdim = int(p[0])
-                        ydim = int(p[1])
-                    continue
-                self.oled.pixel(int(p[0]) + x_offset + ((self.oled.width - xdim)//2 if center else 0),
-                                int(p[1]) + y_offset + ((self.oled.height - ydim)//2 if center else 0),
-                                int(p[2]))
+    def draw_image(self, img, x_offset=0, y_offset=0, center=False):
+        xdim, ydim = img.DIM
+        data = img.PIXELS
+        for i in range(0, len(data), 2):
+            self.oled.pixel(
+                data[i]   + x_offset + ((self.oled.width  - xdim) // 2 if center else 0),
+                data[i+1] + y_offset,
+                1
+            )
 
-    def show_boot(self, logo_path="pictures/logo.csv"):
+    def show_boot(self):
+        from pictures import logo
         self.oled.fill(0)
-        self.draw_image(logo_path)    
+        self.draw_image(logo)
 
     def show_sensor_connected(self, name):
         self.oled.fill(0)
-        # self.text_center("Connected:", 0)
         try:
-            self.draw_image(f'pictures/{name}.csv',center=True)
-        except OSError:
+            img = __import__("pictures." + name.replace(' ', ''), None, None, [name])
+            self.draw_image(img, center=True)
+        except ImportError:
             pass
         self.text_center(name, 55)    
 

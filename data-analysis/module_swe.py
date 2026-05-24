@@ -5,6 +5,7 @@ from copy import copy
 from scipy.signal import find_peaks
 from collections.abc import Sequence
 
+
 class getter:
     '''
     RÖR INTE SOM DELTAGARE / DO NOT TOUCH AS A PARTICIPANT
@@ -13,6 +14,7 @@ class getter:
     def __init__(self, headers, values):
         self.rubriker = headers
         self.värden = values
+
     def __str__(self):
         s = ''
         for i in range(len(self.rubriker)):
@@ -27,11 +29,12 @@ class getter:
         return getter(self.rubriker, self.värden * factor)
     def __truediv__(self, term):
         return getter(self.rubriker, self.värden / term)
-    
+
     def __getitem__(self, key):
         if isinstance(key, str):
             key = self.rubriker.index(key)
         return self.värden[key]
+
     def __setitem__(self, key, value):
         if isinstance(key, str):
             key = self.rubriker.index(key)
@@ -55,7 +58,7 @@ class läs:
     Exempel:
         data = läs('data.csv')
     '''
-    def __init__(self, path:str = 'data.csv', x:str= None): #helt lost?
+    def __init__(self, path: str = 'data.csv', x: str = None):
         self.x = []
         self.y = []
         self.path = path
@@ -76,67 +79,106 @@ class läs:
         self.x = array(self.x)
         self.y = getter(self.rubriker, array(self.y).T)
 
-    def nollställ(self, index=None):
+    def _resolve_indices(self, index: tuple) -> list:
         '''
-        Nollsäller y-värdena så att det första y-värdet blir 0.
-
-        Konfigurationsargument:
-            index (str or int): Vilken y-kolumn som ska nollsättas. Default är None, vilket nollsätter alla kolumner.
+        Intern hjälpmetod. Konverterar *index-argument till en lista av strängnycklar.
+        Tomt index → alla kolumner. Strängar används direkt, heltal slås upp i rubriker.
         '''
-        if index is not None:
-            self.y[index] -= self.y[index][0]
+        if not index:
+            return list(self.rubriker)
+        resolved = []
+        for idx in index:
+            if isinstance(idx, str):
+                if idx not in self.rubriker:
+                    raise KeyError(f"Kolumnen '{idx}' finns inte. Tillgängliga: {self.rubriker}")
+                resolved.append(idx)
+            elif isinstance(idx, int):
+                resolved.append(self.rubriker[idx])
+            else:
+                raise TypeError(f"Index måste vara str eller int, fick {type(idx).__name__}")
+        return resolved
 
-    def medelvärde(self, ft:Sequence=None, index=None):
+    def nollställ(self, *index):
+        '''
+        Nollsätter y-värdena så att det första y-värdet blir 0.
+
+        Argument:
+            *index (str or int): Kolumner att nollsätta. Ange ingen för att nollsätta alla.
+
+        Exempel:
+            data.nollställ()                          # alla kolumner
+            data.nollställ('Temperature_K')           # en kolumn via namn
+            data.nollställ(0)                         # en kolumn via index
+            data.nollställ('Temperature_K', 'Volt')   # flera kolumner
+        '''
+        for idx in self._resolve_indices(index):
+            self.y[idx] -= self.y[idx][0]
+
+    def medelvärde(self, *index, ft: Sequence = None):
         '''
         Beräknar medelvärdet av y-värdena i ett visst intervall av x-värden.
 
-        Konfigurationsargument:
+        Argument:
+            *index (str or int): Kolumner att beräkna medelvärdet för. Ange ingen för totalt medelvärde.
+
+        Nyckelordsargument:
             ft (arraylike): Intervall för x-värden.
-            index (str or int): Vilken y-kolumn som ska användas. Default är None, vilket använder alla kolumner.
-        
+
         Returnerar:
-            float: Medelvärdet av y-värdena i det angivna intervallet.
+            float om ingen eller en kolumn anges, getter med floats om flera kolumner anges.
 
         Exempel:
-            data.medelvärde(ft=(0, 20), index='Temperature_K')
+            data.medelvärde()                                     # totalt medelvärde
+            data.medelvärde('Temperature_K', ft=(0, 20))          # en kolumn
+            data.medelvärde('Temperature_K', 'Volt', ft=(0, 20))  # flera kolumner
+            data.medelvärde(0, 1, ft=(0, 20))                     # via heltalsindex
         '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
-        if index is None:
+        targets = self._resolve_indices(index)
+
+        if not index:
             return self.y.värden.T[mask].T.mean()
-        return self.y[index][mask].mean()
-    
-    def typevärde(self, ft:Sequence=None, index=None):
+        if len(targets) == 1:
+            return self.y[targets[0]][mask].mean()
+        return getter(targets, array([self.y[i][mask].mean() for i in targets]))
+
+    def typevärde(self, *index, ft: Sequence = None):
         '''
         Beräknar typevärdet av y-värdena i ett visst intervall av x-värden.
 
-        Konfigurationsargument:
+        Argument:
+            *index (str or int): Kolumner att beräkna typevärdet för. Ange ingen för alla kolumner.
+
+        Nyckelordsargument:
             ft (arraylike): Intervall för x-värden.
-            index (str or int): Vilken y-kolumn som ska användas. Default är None, vilket använder alla kolumner.
 
         Returnerar:
-            getter: En lista av intervall där flest linjer skär samma y-värde flest gånger.
+            En lista av intervall där flest linjer skär samma y-värde flest gånger.
+            En kolumn returnerar arrayen direkt, flera kolumner returnerar en getter.
 
         Exempel:
-            data.typevärde(ft=(0, 20), index='Temperature_K')
+            data.typevärde()                                     # alla kolumner
+            data.typevärde('Temperature_K', ft=(0, 20))          # en kolumn
+            data.typevärde('Temperature_K', 'Volt', ft=(0, 20))  # flera kolumner
+            data.typevärde(0, ft=(0, 20))                        # via heltalsindex
         '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
-        y = self.y.värden.T[mask].T if index is None else [self.y[index][mask]]
-        
+        targets = self._resolve_indices(index)
+        y_data = [self.y[i][mask] for i in targets]
+
         re = []
-        le = 0
-        for a in y:
-            le += 1
+        for a in y_data:
             interval = []
             n = 0
             lei = 0
             p = set(a[concatenate((find_peaks(a)[0], find_peaks(-a)[0]))])
             for ex in p:
-                s = a-ex
+                s = a - ex
                 counts = 0
-                for q in range(len(s)-1):
-                    if s[q] * s[q+1] <= 0:
+                for q in range(len(s) - 1):
+                    if s[q] * s[q + 1] <= 0:
                         counts += 1
-                
+
                 if counts == n:
                     lei += 1
                     interval.append(ex)
@@ -144,20 +186,19 @@ class läs:
                     n = counts
                     interval = [ex]
                     lei = 1
-                
+
             interval.sort(reverse=True)
-            rei = full((int(ceil(lei/2)),2), nan)
+            rei = full((int(ceil(lei / 2)), 2), nan)
             for i in range(lei):
                 if i % 2 == 0:
-                    rei[int(i/2),0] = interval[i]
+                    rei[int(i / 2), 0] = interval[i]
                 else:
-                    rei[int((i-1)/2),1] = interval[i]
-            #rei is a 2darray which is a list of y-intervals where most lines intersect the same y-value
+                    rei[int((i - 1) / 2), 1] = interval[i]
             re.append(rei)
-        
-        if le == 1:
+
+        if len(targets) == 1:
             return re[0]
-        return getter(self.rubriker, re)
+        return getter(targets, re)
 
 
 class grafritare:
@@ -165,18 +206,17 @@ class grafritare:
     Skapar en grafritare med data från en läs (data) objekt. Förbereder datan för att ritas.
 
     x och y-axelns titlar kan ändras genom att modifiera .xtitel och .ytitel.
-    
+
     Argument:
         data (läs): Datan som ska ritas.
-        ft (arraylike): Intervall för x-värden.
-    
-    Konfigurationsargument:
+
+    Nyckelordsargument:
         ft (arraylike): Intervall för x-värden.
 
     Exempel:
         graf = grafritare(data, ft=(0, 20))
     '''
-    def __init__(self, data:läs, ft:Sequence=None):
+    def __init__(self, data: läs, ft: Sequence = None):
         self.data = copy(data)
         self.xtitel = copy(self.data.xlabel)
         self.ytitel = None
@@ -185,70 +225,64 @@ class grafritare:
         mask = slice(None) if ft is None else (ft[0] <= self.data.x) & (self.data.x <= ft[1])
         self.data.x = self.data.x[mask]
         self.data.y = getter(self.data.rubriker, self.data.y.värden.T[mask].T)
-    
+
     def __update(self, index, target, n):
         if index not in self.dict.keys():
-            self.dict[index] = [None,None,None]
+            self.dict[index] = [None, None, None]
         self.dict[index][n] = target
-    
+
     def __linreg(self, index):
         y = self.data.y[index]
         k = polyfit(self.data.x, y, 1)
         ymean = mean(y)
         yhat = polyval(k, self.data.x)
-        sstot = sum((y-ymean)**2)
-        ssres = sum((y - yhat)**2)
-        r2 = 1 - ssres/sstot if sstot != 0 else 1.
+        sstot = sum((y - ymean) ** 2)
+        ssres = sum((y - yhat) ** 2)
+        r2 = 1 - ssres / sstot if sstot != 0 else 1.
         return [k[0], k[1], r2]
 
-    def rita(self, index=None):
+    def rita(self, *index):
         '''
         Ritar data och förbereder det för .visa()
 
-        Konfigurationsargument:
-            index (str or int): Vilken y-kolumn som ska ritas. Default är None, vilket ritar alla kolumner.
-        
+        Argument:
+            *index (str or int): Kolumner att rita. Ange ingen för att rita alla kolumner.
+
         Exempel:
-            graf.rita(index='Temperature_K')
+            graf.rita()                        # alla kolumner
+            graf.rita('Temperature_K')         # en kolumn via namn
+            graf.rita(0)                       # en kolumn via index
+            graf.rita('Temperature_K', 'Volt') # flera kolumner
         '''
-        if index is not None:
-            if not isinstance(index, str):
-                index = self.data.rubriker[index]
-            self.__update(index, self.data.y[index], 0)
+        for i in self.data._resolve_indices(index):
+            self.__update(i, self.data.y[i], 0)
 
-        else:
-            for i in self.data.rubriker:
-                self.__update(i, self.data.y[i], 0)
-
-    def trend(self, index=None, namn=False):
+    def trend(self, *index, namn: bool = False):
         '''
         Beräknar och förbereder en trendlinje för .visa()
-        
-        Konfigurationsargument:
-            index (str or int): Vilken y-kolumn som ska användas för trendlinjen. Default är None, vilket använder alla kolumner.
+
+        Argument:
+            *index (str or int): Kolumner att beräkna trendlinjer för. Ange ingen för alla kolumner.
+
+        Nyckelordsargument:
             namn (bool): Om True, lägger till en etikett med lutning, intercept och R^2-värde i legendan. Default är False.
+
+        Exempel:
+            graf.trend()                              # alla kolumner
+            graf.trend('Temperature_K', namn=True)    # en kolumn med etikett
+            graf.trend(0, 1)                          # flera kolumner via index
         '''
-        if index is not None:
-            if not isinstance(index, str):
-                index = self.data.rubriker[index]
-            
-            k = self.__linreg(index)
-            self.__update(index, k[0]*self.data.x + k[1], 1)
+        for i in self.data._resolve_indices(index):
+            k = self.__linreg(i)
+            self.__update(i, k[0] * self.data.x + k[1], 1)
             if namn:
-                self.__update(index, f'Trendlinje för {index}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
+                self.__update(i, f'Trendlinje för {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
-        else:
-            for i in self.data.rubriker:
-                k = self.__linreg(i)
-                self.__update(i, k[0]*self.data.x + k[1], 1)
-                if namn:
-                    self.__update(i, f'Trendlinje för {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
-
-    def visa(self, *, markörer=True, linjer=True, invertera:bool=True, rutnät:bool=True):
+    def visa(self, *, markörer: bool = True, linjer: bool = True, invertera: bool = True, rutnät: bool = True):
         '''
         Visar grafen.
 
-        Konfigurationsargument (nyckelord):
+        Nyckelordsargument:
             markörer (bool): Om True, ritar markörer på datapunkterna. Default är True.
             linjer (bool): Om True, ritar linjer mellan datapunkterna. Default är True.
             invertera (bool): Om True, inverterar x- och y-axlarna. Default är True.
@@ -259,8 +293,8 @@ class grafritare:
         markrs = 'x' if markörer else ''
         ldict = 0
 
-        for k,v in self.dict.items():
-            if not(v[0] is None and v[1] is not None):
+        for k, v in self.dict.items():
+            if not (v[0] is None and v[1] is not None):
                 ldict += 1
                 yname = k
                 color = ax._get_lines.get_next_color()
@@ -296,15 +330,15 @@ class grafritare:
                     fig.legend()
             else:
                 ax.set_ylabel(self.ytitel)
-        
+
         fig.tight_layout()
         plt.show()
-    
-    def visalådagram(self, *, rutnät:bool=True):
+
+    def visalådagram(self, *, rutnät: bool = True):
         '''
         Visar ett lådagram för datan.
 
-        Konfigurationsargument:
+        Nyckelordsargument:
             rutnät (bool): Om True, ritar ett rutnät. Default är True.
         '''
         fig, ax = plt.subplots(label=self.data.path)
@@ -322,13 +356,15 @@ class grafritare:
         ax.set_ylabel(self.ytitel)
         plt.show()
 
-    def visafördelning(self, normal:bool=True, title:bool=False, *, rutnät:bool=True, res=100):
+    def visafördelning(self, normal: bool = True, title: bool = False, *, rutnät: bool = True, res=100):
         '''
         Visar hur många gånger datan korsar olika y-värden, vilket kan ge en indikation på datans fördelning.
 
         Konfigurationsargument:
             normal (bool): Om True, ritar en normalfördelningskurva baserat. Default är True.
             title (bool): Om True, sätter titlar på varje subplot. Default är False.
+
+        Nyckelordsargument:
             rutnät (bool): Om True, ritar ett rutnät. Default är True.
             res (int): Antal y-värden att räkna korsningar för. Default är 100.
         '''
@@ -340,7 +376,7 @@ class grafritare:
                 label.append(k)
         lenq = len(q)
         w = int(sqrt(lenq))
-        h = int((lenq/w)+.999999999)
+        h = int((lenq / w) + .999999999)
 
         fig, ax = plt.subplots(h, w, label=self.data.path)
         if lenq == 1:
@@ -352,18 +388,19 @@ class grafritare:
             count = []
             for y in yrange:
                 bl = sign(q[j] - y)
-                for i in range(len(bl)-1):
-                    if bl[i] != bl[i+1]:
+                for i in range(len(bl) - 1):
+                    if bl[i] != bl[i + 1]:
                         count.append(y)
             sigma = std(q[j])
             mu = mean(q[j])
-            factor = (q[j].max()-q[j].min())/res * len(count)
+            factor = (q[j].max() - q[j].min()) / res * len(count)
             color = ax[j]._get_lines.get_next_color()
             if normal:
-                ax[j].plot(yrange, factor/(sigma * sqrt(2*pi)) * e**(- (yrange - mu)**2 / (2*sigma**2)), color=color, label=f'Normal Distribution:\n$\\sigma = {sigma:.4f}$\n$\\mu = {mu:.4f}$')
+                ax[j].plot(yrange, factor / (sigma * sqrt(2 * pi)) * e ** (-(yrange - mu) ** 2 / (2 * sigma ** 2)),
+                           color=color, label=f'Normal Distribution:\n$\\sigma = {sigma:.4f}$\n$\\mu = {mu:.4f}$')
                 ax[j].legend()
             color = ax[j]._get_lines.get_next_color()
-            ax[j].hist(count, bins=res, color = color)
+            ax[j].hist(count, bins=res, color=color)
             if title:
                 ax[j].set_title(label[j])
             if self.ytitel is None:
