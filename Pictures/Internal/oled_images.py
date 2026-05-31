@@ -17,7 +17,7 @@ def process(path: str, oleddim, invert=False):
     ver = 0
     print(OUTPUT + path.split('/')[-1][:-3].replace(" ", "") + 'py')
     output = open(OUTPUT + path.split("/")[-1][:-3].replace(" ", "") + 'py', 'w')
-    output.write(f'DIM = ({ndims[0]},{ndims[1]})\nPIXELS = bytes(')
+    output.write(f'DIM = ({ndims[0]},{ndims[1]})\nPIXELS = bytes([')
     pixels = img.load()
     for x in range(ndims[0]):
         for y in range(ndims[1]):
@@ -26,8 +26,11 @@ def process(path: str, oleddim, invert=False):
                 continue
             output.write(f'{x},{y},')
             ver += 1
-    output.write(')')
+    output.write('])')
     print(f"Converted {path} ({ver} pixels)")
 
 for path in glob.glob(f"Pictures/Internal/*.png"):
+    if path == "Pictures/Internal/logo.png":
+        process(path, [128, 64])
+        continue
     process(path, [128, 40])
