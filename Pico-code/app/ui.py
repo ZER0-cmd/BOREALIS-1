@@ -37,17 +37,20 @@ class Ui:
     def draw_image(self, img, x_offset=0, y_offset=0, center=False):
         xdim, ydim = img.DIM
         data = img.PIXELS
+
+        x_center = ((self.oled.width - xdim) // 2) if center else 0
+        # y_center = ((self.oled.height - ydim) // 2) if center else 0
+        
         for i in range(0, len(data), 2):
-            self.oled.pixel(
-                data[i]   + x_offset + ((self.oled.width  - xdim) // 2 if center else 0),
-                data[i+1] + y_offset,
-                1
-            )
+            x = data[i]   + x_offset + x_center
+            y = data[i+1] + y_offset
+            if 0 <= x < self.oled.width and 0 <= y < self.oled.height:
+                self.oled.pixel(x, y, 1)
 
     def show_boot(self):
         from pictures import logo
         self.oled.fill(0)
-        self.draw_image(logo)
+        self.draw_image(logo, center=True)
 
     def show_sensor_connected(self, name):
         self.oled.fill(0)
