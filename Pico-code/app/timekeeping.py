@@ -48,4 +48,4 @@ class Timekeeper:
     def fdate(self):
         if self.rtc_ok:
             y, mo, d, w, h, m, s, _= self.rtc.datetime()
-            return f'{y}/{mo:02d}/{d:02d}@{h:02d}:{m:02d}:{s:02d}'
+            return f'{y}-{mo:02d}-{d:02d} {h:02d}:{m:02d}:{s:02d}'
