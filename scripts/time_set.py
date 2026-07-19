@@ -1,16 +1,18 @@
-# Run: mpremote run scripts/time_set.py (Get-Date -Format "yyyy MM dd w HH mm ss")
-
+# Run: mpremote mount Pico-code exec "TIME_STR='$(date +"%Y %m %d %w %H %M %S")'" run scripts/time_set.py
 
 from machine import Pin, I2C
-from drivers.rtc_ds3231 import DS3231
-import sys
+from drivers.rtc_ds1302 import DS1302
+import config
 
 # "%Y %m %d %w %H %M %S"
-TIME = sys.argv
+TIME = [int(x) for x in TIME_STR.split(" ")]
 
-i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
-rtc_ext = DS3231(i2c)
+rtc = DS1302(
+                Pin(config.DS1302_CLK),
+                Pin(config.DS1302_DAT),
+                Pin(config.DS1302_CE),
+            )
 
-rtc_ext.datetime((*TIME, 0))
+rtc.datetime(tuple(TIME + [0]))
 
-print("DS3231 set to:", rtc_ext.datetime())
+print("DS3231 set to:", rtc.datetime())
