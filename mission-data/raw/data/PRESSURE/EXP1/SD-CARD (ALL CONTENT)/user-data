@@ -1,0 +1,43 @@
+#cloud-config
+manage_resolv_conf: false
+hostname: HAZ1
+manage_etc_hosts: true
+packages:
+- avahi-daemon
+apt:
+  preserve_sources_list: true
+  conf: |
+    Acquire {
+      Check-Date "false";
+    };
+timezone: Europe/Stockholm
+keyboard:
+  model: pc105
+  layout: "se"
+users:
+- name: alhazen
+  groups: users,adm,dialout,audio,netdev,video,plugdev,cdrom,games,input,gpio,spi,i2c,render,sudo
+  shell: /bin/bash
+  lock_passwd: false
+  passwd: "$y$jB5$dZ5JA34HJtqOpZ1RH3aRL/$K4ERUSqhhGZ1ar1drX1wOqR7saCPqIy2pRrY5eHEU/2"
+enable_ssh: true
+ssh_pwauth: true
+rpi:
+  interfaces:
+    serial: true
+runcmd:
+  - [ sh, -c, "install -o alhazen -m 700 -d /home/alhazen/.config/com.raspberrypi.connect" ]
+  - [ sh, -c, "printf '%s\n' 'rpuak_gqcEqsTrDRFpSCm1Q7BUskT2' > /home/alhazen/.config/com.raspberrypi.connect/auth.key && chown alhazen:alhazen /home/alhazen/.config/com.raspberrypi.connect/auth.key && chmod 600 /home/alhazen/.config/com.raspberrypi.connect/auth.key" ]
+  - [ sh, -c, "install -o alhazen -m 700 -d /home/alhazen/.config/systemd/user/default.target.wants /home/alhazen/.config/systemd/user/paths.target.wants" ]
+  - [ sh, -c, "UNIT_SRC=/usr/lib/systemd/user/rpi-connect.service; [ -f $UNIT_SRC ] || UNIT_SRC=/lib/systemd/user/rpi-connect.service; ln -sf $UNIT_SRC /home/alhazen/.config/systemd/user/default.target.wants/rpi-connect.service" ]
+  - [ sh, -c, "UNIT_SRC=/usr/lib/systemd/user/rpi-connect-signin.path; [ -f $UNIT_SRC ] || UNIT_SRC=/lib/systemd/user/rpi-connect-signin.path; ln -sf $UNIT_SRC /home/alhazen/.config/systemd/user/paths.target.wants/rpi-connect-signin.path" ]
+  - [ sh, -c, "UNIT_SRC=/usr/lib/systemd/user/rpi-connect-wayvnc.service; [ -f $UNIT_SRC ] || UNIT_SRC=/lib/systemd/user/rpi-connect-wayvnc.service; ln -sf $UNIT_SRC /home/alhazen/.config/systemd/user/default.target.wants/rpi-connect-wayvnc.service" ]
+  - [ sh, -c, "chown -R alhazen:alhazen /home/alhazen/.config/systemd" ]
+  - [ sh, -c, "install -d -m 0755 /var/lib/systemd/linger" ]
+  - [ sh, -c, "install -m 0644 /dev/null /var/lib/systemd/linger/alhazen" ]
+  - [ sh, -c, "loginctl enable-linger alhazen 2>/dev/null || true" ]
+  - [ sleep, "2" ]
+  - [ sh, -c, "systemctl --quiet --user --machine=alhazen@.host daemon-reload || true" ]
+  - [ sh, -c, "systemctl --quiet --user --machine=alhazen@.host start rpi-connect.service || true" ]
+  - [ sh, -c, "systemctl --quiet --user --machine=alhazen@.host start rpi-connect-signin.path || true" ]
+  - [ sh, -c, "systemctl --quiet --user --machine=alhazen@.host start rpi-connect-wayvnc.service || true" ]

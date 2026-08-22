@@ -1,0 +1,15 @@
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+      dhcp6: true
+      optional: true
+  wifis:
+    wlan0:
+      dhcp4: true
+      regulatory-domain: "SE"
+      access-points:
+        "ارتنت خورافي -_-":
+          password: "3fd13e8598ff5ad61861a9bf7c14737913b0e363d6db58ca5cf9e64abb2fe73e"
+      optional: true
