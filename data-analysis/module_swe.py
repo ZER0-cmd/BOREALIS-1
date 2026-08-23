@@ -74,11 +74,11 @@ class läs:
                 raise NameError("No compoatible elevation data found. Manually input as argument instead")
             self.rubriker.remove(x)
             try:
-                self.headers.remove("datetime")
-                self.headers.remove("elapsed_s")
+                self.rubriker.remove("datetime")
+                self.rubriker.remove("elapsed_s")
             except Exception:
                 pass
-            
+
             self.xlabel = x
             for row in reader:
                 data = []
