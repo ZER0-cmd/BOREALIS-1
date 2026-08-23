@@ -93,11 +93,7 @@ class läs:
         self.rubriker = [rubrik]
         self.y = getter([rubrik], linalg.norm(self.y.värden, axis=0)[newaxis, :])
 
-    def _resolve_indices(self, index: tuple) -> list:
-        '''
-        Intern hjälpmetod. Konverterar *index-argument till en lista av strängnycklar.
-        Tomt index → alla kolumner. Strängar används direkt, heltal slås upp i rubriker.
-        '''
+    def _resolve_indices(self, index: tuple):
         if not index:
             return list(self.rubriker)
         resolved = []
@@ -111,6 +107,16 @@ class läs:
             else:
                 raise TypeError(f"Index måste vara str eller int, fick {type(idx).__name__}")
         return resolved
+
+    def rengör(self, res, *index):
+        s = shape(self.y.värden)[1]
+        targets = self._resolve_indices(index)
+        arr = zeros((len(targets), s // res))
+        for k, idx in enumerate(targets):
+            for i in range(s // res):
+                for j in range(res):
+                    arr[k, i] += self.y[idx][i*res+j] / res
+        return getter(targets, arr)
 
     def nollställ(self, *index):
         '''
@@ -178,10 +184,10 @@ class läs:
         '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
         targets = self._resolve_indices(index)
-        y_data = [self.y[i][mask] for i in targets]
+        y = [self.y[i][mask] for i in targets]
 
         re = []
-        for a in y_data:
+        for a in y:
             interval = []
             n = 0
             lei = 0

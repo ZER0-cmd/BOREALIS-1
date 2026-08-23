@@ -89,17 +89,42 @@ class read:
         self.headers = [title]
         self.y = getter([title], linalg.norm(self.y.values, axis=0)[newaxis, :])
 
-    def zero(self, index=None):
+    def cleanup(self, res, *index):
+            s = shape(self.y.values)[1]
+            targets = self._resolve_indices(index)
+            arr = zeros((len(targets), s // res))
+            for k, idx in enumerate(targets):
+                for i in range(s // res):
+                    for j in range(res):
+                        arr[k, i] += self.y[idx][i*res+j] / res
+            return getter(targets, arr)
+
+    def _resolve_indices(self, index: tuple):
+        if not index:
+            return list(self.headers)
+        resolved = []
+        for idx in index:
+            if isinstance(idx, str):
+                if idx not in self.headers:
+                    raise KeyError(f"The column '{idx}' does not exist. Avaiable: {self.rubriker}")
+                resolved.append(idx)
+            elif isinstance(idx, int):
+                resolved.append(self.rubriker[idx])
+            else:
+                raise TypeError(f"Index must be str or int, got: {type(idx).__name__}")
+        return resolved
+
+    def zero(self, *index):
         '''
         Zeroes the y-values so that the first y-values is zero.
 
         Optional arguments:
             index (str or int): The header or index of the y-values to zero. Default is None, which zeros all y-values.
         '''
-        if index is not None:
-            self.y[index] -= self.y[index][0]
+        for idx in self._resolve_indices(index):
+            self.y[idx] -= self.y[idx][0]
 
-    def mean(self, ft:Sequence=None, index=None):
+    def mean(self, ft:Sequence=None, *index):
         '''
         Returns the mean of the y-values in the given x-interval.
         
@@ -114,11 +139,15 @@ class read:
             data.mean(ft=(0, 20), index='Temperature_K')
         '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
-        if index is None:
+        targets = self._resolve_indices(index)
+
+        if not index:
             return self.y.values.T[mask].T.mean()
-        return self.y[index][mask].mean()
+        if len(targets) == 1:
+            return self.y[targets[0]][mask].mean()
+        return getter(targets, array([self.y[i][mask].mean() for i in targets]))
     
-    def typevalue(self, ft=None, index=None):
+    def typevalue(self, ft=None, *index):
         '''
         Returns the typevalue of the y-values in the given x-interval.
 
@@ -133,7 +162,8 @@ class read:
             data.typevalue(ft=(0, 20), index='Temperature_K')
         '''
         mask = slice(None) if ft is None else (ft[0] <= self.x) & (self.x <= ft[1])
-        y = self.y.values.T[mask].T if index is None else [self.y[index][mask]]
+        targets = self._resolve_indices(index)
+        y = [self.y[i][mask] for i in targets]
         
         re = []
         le = 0
@@ -213,7 +243,7 @@ class plotter:
         r2 = 1 - ssres/sstot if sstot != 0 else 1.
         return [k[0], k[1], r2]
 
-    def plot(self, index=None):
+    def plot(self, *index):
         '''
         Plots the data and prepares it for .show()
 
@@ -224,16 +254,10 @@ class plotter:
             graph.plot('Temperature_K')
     
         '''
-        if index is not None:
-            if not isinstance(index, str):
-                index = self.data.headers[index]
-            self.__update(index, self.data.y[index], 0)
+        for i in self.data._resolve_indices(index):
+            self.__update(i, self.data.y[i], 0)
 
-        else:
-            for i in self.data.headers:
-                self.__update(i, self.data.y[i], 0)
-
-    def trend(self, index=None, name=False):
+    def trend(self, *index, name=False):
         '''
         Plots the trendline for the data and prepares it for .show()
 
@@ -241,21 +265,11 @@ class plotter:
             index (str or int): The header name or index of the data to plot the trendline for. If None, trendlines for all data are plotted.
             name (bool): Whether to include the slope, intercept and R^2 value in the legend. Default is False.
         '''
-        if index is not None:
-            if not isinstance(index, str):
-                index = self.data.headers[index]
-            
-            k = self.__linreg(index)
-            self.__update(index, k[0]*self.data.x + k[1], 1)
+        for i in self.data._resolve_indices(index):
+            k = self.__linreg(i)
+            self.__update(i, k[0] * self.data.x + k[1], 1)
             if name:
                 self.__update(index, f'Trendline for {index}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
-
-        else:
-            for i in self.data.headers:
-                k = self.__linreg(i)
-                self.__update(i, k[0]*self.data.x + k[1], 1)
-                if name:
-                    self.__update(i, f'Trendline for {i}:\nk = {k[0]:.4f}\nm = {k[1]:.4f}\nR^2 = {k[2]:.4f}', 2)
 
     def show(self, *, markers=True, lines=True, invert:bool=True, grid:bool=True):
         '''
