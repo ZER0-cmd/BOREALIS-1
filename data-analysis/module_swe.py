@@ -89,8 +89,8 @@ class läs:
         self.x = array(self.x)
         self.y = getter(self.rubriker, array(self.y).T)
 
-        def norm(self, rubrik=""):
-            return getter([rubrik], linalg.norm(self.y.värden, axis=0))
+    def norm(self, rubrik=""):
+        return getter([rubrik], linalg.norm(self.y.värden, axis=0))
 
     def _resolve_indices(self, index: tuple) -> list:
         '''

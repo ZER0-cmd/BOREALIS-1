@@ -85,8 +85,8 @@ class read:
         self.x = array(self.x)
         self.y = getter(self.headers, array(self.y).T)
 
-        def norm(self, title=""):
-            return getter([title], linalg.norm(self.y.values, axis=0))
+    def norm(self, title=""):
+        return getter([title], linalg.norm(self.y.values, axis=0))
 
     def zero(self, index=None):
         '''
