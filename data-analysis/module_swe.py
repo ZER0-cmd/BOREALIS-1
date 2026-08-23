@@ -90,7 +90,7 @@ class läs:
         self.y = getter(self.rubriker, array(self.y).T)
 
     def norm(self, rubrik=""):
-        self.y = getter([rubrik], linalg.norm(self.y.värden, axis=0))
+        self.y = getter([rubrik], linalg.norm(self.y.värden, axis=0)[newaxis, :])
 
     def _resolve_indices(self, index: tuple) -> list:
         '''
