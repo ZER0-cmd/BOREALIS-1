@@ -108,15 +108,14 @@ class läs:
                 raise TypeError(f"Index måste vara str eller int, fick {type(idx).__name__}")
         return resolved
 
-    def rengör(self, res, *index):
-        s = shape(self.y.värden)[1]
-        targets = self._resolve_indices(index)
-        arr = zeros((len(targets), s // res))
-        for k, idx in enumerate(targets):
-            for i in range(s // res):
-                for j in range(res):
-                    arr[k, i] += self.y[idx][i*res+j] / res
-        return getter(targets, arr)
+    def rengör(self, res):
+        s = shape(self.y.värden)
+        arr = zeros((s[0], s[1] // res))
+        for i in range(s[1] // res):
+            for j in range(res):
+                for idx in range(s[0]):
+                    arr[idx, i] += self.y[idx][i*res+j] / res
+        self.y = getter(self.rubriker, arr)
 
     def nollställ(self, *index):
         '''

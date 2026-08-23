@@ -89,15 +89,14 @@ class read:
         self.headers = [title]
         self.y = getter([title], linalg.norm(self.y.values, axis=0)[newaxis, :])
 
-    def cleanup(self, res, *index):
-            s = shape(self.y.values)[1]
-            targets = self._resolve_indices(index)
-            arr = zeros((len(targets), s // res))
-            for k, idx in enumerate(targets):
-                for i in range(s // res):
-                    for j in range(res):
-                        arr[k, i] += self.y[idx][i*res+j] / res
-            return getter(targets, arr)
+    def cleanup(self, res):
+        s = shape(self.y.values)
+        arr = zeros((s[0], s[1] // res))
+        for i in range(s[1] // res):
+            for j in range(res):
+                for idx in range(s[0]):
+                    arr[idx, i] += self.y[idx][i*res+j] / res
+        self.y = getter(self.headers, arr)
 
     def _resolve_indices(self, index: tuple):
         if not index:
