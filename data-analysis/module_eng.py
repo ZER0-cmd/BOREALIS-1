@@ -92,11 +92,14 @@ class read:
     def cleanup(self, res):
         s = shape(self.y.values)
         arr = zeros((s[0], s[1] // res))
+        xar = zeros(s[1] // res)
         for i in range(s[1] // res):
             for j in range(res):
+                xar[i] = self.x[i*res + j]
                 for idx in range(s[0]):
-                    arr[idx, i] += self.y[idx][i*res+j] / res
+                    arr[idx, i] += self.y[idx][i*res + j] / res
         self.y = getter(self.headers, arr)
+        self.x = xar
 
     def _resolve_indices(self, index: tuple):
         if not index:
