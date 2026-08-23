@@ -86,6 +86,7 @@ class read:
         self.y = getter(self.headers, array(self.y).T)
 
     def norm(self, title=""):
+        self.headers = [title]
         self.y = getter([title], linalg.norm(self.y.values, axis=0)[newaxis, :])
 
     def zero(self, index=None):
