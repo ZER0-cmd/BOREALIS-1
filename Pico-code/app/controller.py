@@ -186,7 +186,6 @@ class Core(Timekeeper):
 
             show(*(self.data[k] for k in self.sensorkeys))
 
-            # Mark fresh data as available – only reset when consumed
             self.dataready = True
             
 
@@ -236,34 +235,17 @@ class Core(Timekeeper):
 
 
 class Library(Core):
-    """
-    Manages the core runtime environment for experiments, handling sensor data 
-    collection, data logging to SD cards, OLED display updates, user input 
-    button management, and sensor calibration.
-    """
     def __init__(self):
-        """
-        Initializes the Library instance, setting up internal states for data 
-        storage and button-debounce tracking.
-        """
         Core.__init__(self)
         self.file = None
         self.cdata = {}
 
-        # Button debounce and state tracking variables
         self._btn_last_state = False
         self._btn_last_change = 0
         self._btn_press_start = 0
         self._btn_last_release = None
 
     def _resetmanager(self):
-        """
-        Monitors the system reset buttons to trigger system events. 
-        
-        Implements software debouncing. Handles two main interactions:
-        1. Double-click: Creates a new default data log file.
-        2. Long-press (>= 2 seconds): Triggers a hard system reset.
-        """
         now = time.ticks_ms()
         pressed = self.reset1.value() or self.reset2.value()
 
@@ -297,7 +279,6 @@ class Library(Core):
     def read_sensor(self):
         """
         Return the most recent sensor data as a list.
-        Blocks until a new sample has been taken by _experimentmanager().
 
         Returns:
             list: A list containing timestamps, elapsed seconds, and filtered 
@@ -314,8 +295,7 @@ class Library(Core):
                 
     def run(self, setup, loop):
         """
-        Starts the main program loop. Handles device initialization, boot animations, 
-        startup self-checks, and continuous background manager updates.
+        Runs the inputted code
 
         Args:
             setup (function): User-defined function run once at startup.
@@ -338,8 +318,7 @@ class Library(Core):
 
     def newfile(self, path=None):
         """
-        Attempts to create a new log file on the SD card. Retries up to 20 times 
-        while waiting for the SD card logging system to become ready.
+        Attempts to create a new log file on the SD card.
 
         Args:
             path (str): The destination file path. Defaults to config.DEFAULT_FILE_NAME.
@@ -358,8 +337,7 @@ class Library(Core):
 
     def loadfile(self, path):
         """
-        Attempts to load an existing file from the SD card. Retries up to 20 times
-        while waiting for the logging system to become ready.
+        Attempts to load an existing file from the SD card.
 
         Args:
             path (str): The path of the file to load.
@@ -376,8 +354,7 @@ class Library(Core):
 
     def log_data(self, data):
         """
-        Writes a single row of data to the currently open log file. Retries up to 
-        20 times with a 50ms delay if an exception occurs during the write attempt.
+        Writes a single row of data to the currently open log file. 
 
         Args:
             data (list/tuple): The row data to be written into the log file.
@@ -408,6 +385,8 @@ class Library(Core):
                         continue
                     if headers is None:
                         headers = self.datakeys
+                    else:
+                        headers = headers + self.sensorkeys
                     self.file.write_headers(headers)
                     break
                 except Exception as e:

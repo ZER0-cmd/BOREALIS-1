@@ -66,9 +66,13 @@ class läs:
             reader = csv.DictReader(file)
             self.rubriker = reader.fieldnames.copy()
             if x is None:
-                x = self.rubriker.pop(0)
-            else:
-                self.rubriker.remove(x)
+                for name in self.rubriker:
+                    if 'elevation' in name.lower() or 'altitude' in name.lower():
+                        x = name
+                        break
+            if x is None:
+                raise NameError("No compoatible elevation data found. Manually input as argument instead")
+            self.rubriker.remove(x)
             self.xlabel = x
             for row in reader:
                 data = []

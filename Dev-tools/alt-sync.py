@@ -45,6 +45,7 @@ def process(file, output):
 for root, dirs, files in os.walk(ex):
     if 'SD-CARD (ALL CONTENT)' in root: # Skips raw files. Change if needed
         continue
+
     rroot = os.path.relpath(root, ex)
     droot = out if rroot == '.' else os.path.join(out, rroot)
     os.makedirs(droot, exist_ok=True)
