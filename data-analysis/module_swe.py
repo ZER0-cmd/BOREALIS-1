@@ -34,7 +34,7 @@ class getter:
         if isinstance(key, str):
             key = self.rubriker.index(key)
         return self.värden[key]
-
+    
     def __setitem__(self, key, value):
         if isinstance(key, str):
             key = self.rubriker.index(key)
@@ -88,6 +88,9 @@ class läs:
                 self.y.append(data)
         self.x = array(self.x)
         self.y = getter(self.rubriker, array(self.y).T)
+
+        def norm(self, rubrik=""):
+            return getter([rubrik], linalg.norm(self.y.värden, axis=0))
 
     def _resolve_indices(self, index: tuple) -> list:
         '''
