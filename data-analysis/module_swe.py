@@ -249,7 +249,7 @@ class grafritare:
         self.plots = []
         mask = slice(None) if ft is None else (ft[0] <= self.data.x) & (self.data.x <= ft[1])
         self.data.x = self.data.x[mask]
-        self.data.y = getter(self.data.rubriker, self.data.y.värden.T[mask].T)
+        self.data.y = getter(self.data.y.rubriker, self.data.y.värden.T[mask].T)
 
     def __update(self, index, target, n):
         if index not in self.dict.keys():
