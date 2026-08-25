@@ -64,18 +64,18 @@ class läs:
         self.path = path
         with open(path, 'r') as file:
             reader = csv.DictReader(file)
-            self.rubriker = reader.fieldnames.copy()
+            headers = reader.fieldnames.copy()
             if x is None:
-                for name in self.rubriker:
+                for name in headers:
                     if 'elevation' in name.lower() or 'altitude' in name.lower():
                         x = name
                         break
             if x is None:
                 raise NameError("No compoatible elevation data found. Manually input as argument instead")
-            self.rubriker.remove(x)
+            headers.remove(x)
             try:
-                self.rubriker.remove("datetime")
-                self.rubriker.remove("elapsed_s")
+                headers.remove("datetime")
+                headers.remove("elapsed_s")
             except Exception:
                 pass
 
@@ -83,34 +83,33 @@ class läs:
             for row in reader:
                 data = []
                 self.x.append(float(row[x]))
-                for header in self.rubriker:
+                for header in headers:
                     data.append(float(row[header]))
                 self.y.append(data)
         self.x = array(self.x)
-        self.y = getter(self.rubriker, array(self.y).T)
+        self.y = getter(headers, array(self.y).T)
 
     def _resolve_indices(self, index: tuple):
         if not index:
-            return list(self.rubriker)
+            return list(self.y.rubriker)
         resolved = []
         for idx in index:
             if isinstance(idx, str):
-                if idx not in self.rubriker:
-                    raise KeyError(f"Kolumnen '{idx}' finns inte. Tillgängliga: {self.rubriker}")
+                if idx not in self.y.rubriker:
+                    raise KeyError(f"Kolumnen '{idx}' finns inte. Tillgängliga: {self.y.rubriker}")
                 resolved.append(idx)
             elif isinstance(idx, int):
-                resolved.append(self.rubriker[idx])
+                resolved.append(self.y.rubriker[idx])
             else:
                 raise TypeError(f"Index måste vara str eller int, fick {type(idx).__name__}")
         return resolved
 
     def norm(self, *index):
         if index:
-            index = list(index)
-            self.rubriker = index
-            self.y = getter(index, linalg.norm([self.y[i] for i in index], axis=0)[newaxis, :])
+            index = self._resolve_indices(index)
+            self.y = getter(['Norm'], linalg.norm([self.y[i] for i in index], axis=0)[newaxis, :])
         else:
-            self.y = getter([self.rubriker], linalg.norm(self.y.värden, axis=0)[newaxis, :])
+            self.y = getter(['Norm'], linalg.norm(self.y.värden, axis=0)[newaxis, :])
 
     def rengör(self, res):
         s = shape(self.y.värden)
@@ -121,7 +120,7 @@ class läs:
                 xar[i] = self.x[i*res + j]
                 for idx in range(s[0]):
                     arr[idx, i] += self.y[idx][i*res + j] / res
-        self.y = getter(self.rubriker, arr)
+        self.y = getter(self.y.rubriker, arr)
         self.x = xar
 
     def nollställ(self, *index):
