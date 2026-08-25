@@ -89,10 +89,6 @@ class läs:
         self.x = array(self.x)
         self.y = getter(self.rubriker, array(self.y).T)
 
-    def norm(self, rubrik=""):
-        self.rubriker = [rubrik]
-        self.y = getter([rubrik], linalg.norm(self.y.värden, axis=0)[newaxis, :])
-
     def _resolve_indices(self, index: tuple):
         if not index:
             return list(self.rubriker)
@@ -107,6 +103,14 @@ class läs:
             else:
                 raise TypeError(f"Index måste vara str eller int, fick {type(idx).__name__}")
         return resolved
+
+    def norm(self, *index):
+        if index:
+            index = list(index)
+            self.rubriker = index
+            self.y = getter(index, linalg.norm([self.y[i] for i in index], axis=0)[newaxis, :])
+        else:
+            self.y = getter([self.rubriker], linalg.norm(self.y.värden, axis=0)[newaxis, :])
 
     def rengör(self, res):
         s = shape(self.y.värden)
@@ -363,6 +367,7 @@ class grafritare:
         Nyckelordsargument:
             rutnät (bool): Om True, ritar ett rutnät. Default är True.
         '''
+
         fig, ax = plt.subplots(label=self.data.path)
         label = []
         q = []
