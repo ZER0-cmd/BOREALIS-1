@@ -105,6 +105,15 @@ class läs:
         return resolved
 
     def norm(self, *index):
+        '''
+        Tar magnituden på datan (sqrt(x^2 + y^2 + z^2 ...)). Modifierar data direkt.
+
+        Argument:
+            *index (str or int): Kolumner att nollsätta. Ange ingen för att nollsätta alla.
+        
+        Exempel:
+            data.norm('ag_x', 'ag_y', 'ag_z')
+        '''
         if index:
             index = self._resolve_indices(index)
             self.y = getter(['Norm'], linalg.norm([self.y[i] for i in index], axis=0)[newaxis, :])
@@ -112,6 +121,12 @@ class läs:
             self.y = getter(['Norm'], linalg.norm(self.y.värden, axis=0)[newaxis, :])
 
     def rengör(self, res):
+        '''
+        Filtererar extrempunkter och rengör datan genom att ta medelvärden på intervall. Modifierar datan direkt.
+
+        Argument 
+            res (int): Skärpan. Ju mindre desto mer lik originalet. Ju större desto fler detaljer förloras
+        '''
         s = shape(self.y.värden)
         arr = zeros((s[0], s[1] // res))
         xar = zeros(s[1] // res)
